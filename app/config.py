@@ -15,8 +15,12 @@ def _parse_bool(val: Union[str, bool]) -> bool:
 class AppConfig:
     TOKEN: str
     LOG_LEVEL: str = "INFO"
-    ADMIN_LISTS: list
-    THANKS_STIKERS: list
+    ADMIN_LISTS: list = None
+    THANKS_STIKERS: list = None
+    HELLO_MESSAGE: str
+    HELLO_STIKERS: list = None
+    GOODBYE_MESSAGE: str
+    GOODBYE_STIKERS: list = None
 
     def __init__(self, env):
         for field in self.__annotations__:

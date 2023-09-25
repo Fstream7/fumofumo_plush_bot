@@ -8,9 +8,11 @@ router = Router()
 async def message_with_sticker(message: Message):
     await message.answer(f"Sticker file_id {message.sticker.file_id}")
 
+
 @router.message(F.photo)
 async def message_with_photo(message: Message):
     await message.answer(f"Photo file_id {message.photo[-1].file_id}")
+
 
 @router.message(F.animation)
 async def message_with_animation(message: Message):
