@@ -1,0 +1,4 @@
+TOKEN: token:123
+LOG_LEVEL: INFO
+ADMIN_LISTS:
+  - userid

@@ -5,7 +5,7 @@ Silly tg bot
 
 - `git clone https://github.com/Fstream/fumofumo_plush_bot`
 - `cd fumofumo_plush_bot`
-- `cp app/.env_example app/.env`
+- `cp app/config.example.yml app/config.yml`
 - *Fill in all the vars*
 
 # Start with local python:
@@ -16,5 +16,5 @@ python3 app/main.py
 
 # Run with docker
 ```
-docker run --detach -v=$(pwd)/.env:/app/.env ghcr.io/fstream7/fumofumo_plush_bot:main
+docker run --detach -v=$(pwd)/app/config.yml:app/config.yml ghcr.io/fstream7/fumofumo_plush_bot:main
 ```

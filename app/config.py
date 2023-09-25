@@ -1,8 +1,6 @@
-import os
+import yaml
+from os import path
 from typing import get_type_hints, Union
-from dotenv import load_dotenv
-
-load_dotenv()
 
 
 class AppConfigError(Exception):
@@ -16,6 +14,9 @@ def _parse_bool(val: Union[str, bool]) -> bool:
 # AppConfig class with required fields, default values, type checking, and typecasting for int and bool values
 class AppConfig:
     TOKEN: str
+    LOG_LEVEL: str = "INFO"
+    ADMIN_LISTS: list
+    THANKS_STIKER: str
 
     def __init__(self, env):
         for field in self.__annotations__:
@@ -48,4 +49,6 @@ class AppConfig:
 
 
 # Expose Config object for app to import
-Config = AppConfig(os.environ)
+BASE_DIR = path.abspath(path.dirname(__file__))
+with open(path.join(BASE_DIR, "config.yml"), encoding='utf-8') as file:
+    Config = AppConfig(yaml.safe_load(file))
