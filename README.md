@@ -6,7 +6,7 @@ Silly tg bot
 - `git clone https://github.com/Fstream/fumofumo_plush_bot`
 - `cd fumofumo_plush_bot`
 - `cp app/config.example.yml app/config.yml`
-- *Fill in all the vars*
+- *Fill in all the vars. To get media file_id just start a bot and send him any messages you want*
 
 # Start with local python:
 ```

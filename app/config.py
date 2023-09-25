@@ -16,7 +16,7 @@ class AppConfig:
     TOKEN: str
     LOG_LEVEL: str = "INFO"
     ADMIN_LISTS: list
-    THANKS_STIKER: str
+    THANKS_STIKERS: list
 
     def __init__(self, env):
         for field in self.__annotations__:

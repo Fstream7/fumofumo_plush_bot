@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from config import Config
+from random import choice
 
 router = Router()
 
@@ -37,4 +38,4 @@ async def process_name(message: types.Message, state: FSMContext) -> None:
     for chat_id in Config.ADMIN_LISTS:
         await message.forward(chat_id)
     await message.answer("Thanks, message sent to admins, you are greatly appreciated!")
-    await message.answer_sticker(sticker=Config.THANKS_STIKER)
+    await message.answer_sticker(sticker=choice(Config.THANKS_STIKERS))
