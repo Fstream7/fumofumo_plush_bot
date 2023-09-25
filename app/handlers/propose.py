@@ -29,8 +29,7 @@ async def cancel_handler(message: types.Message, state: FSMContext) -> None:
 @router.message(Command("propose"))
 async def cmd_start(message: types.Message, state: FSMContext) -> None:
     if message.chat.type != "private":
-        info = await message.get_me()
-        print(info)
+        await message.answer("Only for private messages")
     else:
         await state.set_state(Form.name)
         await message.answer("Send me a post you want, I will pass it to Admins")
