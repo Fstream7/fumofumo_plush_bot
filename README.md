@@ -16,5 +16,5 @@ python3 app/main.py
 
 # Run with docker
 ```
-docker run --detach -v=$(pwd)/app/config.yml:app/config.yml ghcr.io/fstream7/fumofumo_plush_bot:main
+docker run --detach -v=$(pwd)/app/config.yml:/app/config.yml ghcr.io/fstream7/fumofumo_plush_bot:main
 ```
