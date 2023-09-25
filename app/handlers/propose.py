@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from config import Config
 from random import choice
+from filters.chat_type import ChatTypeFilter
 
 router = Router()
 
@@ -26,13 +27,10 @@ async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     )
 
 
-@router.message(Command("propose"))
+@router.message(Command("propose"), ChatTypeFilter(chat_type=["private"]))
 async def cmd_start(message: types.Message, state: FSMContext) -> None:
-    if message.chat.type != "private":
-        await message.answer("Only for private messages")
-    else:
-        await state.set_state(Form.name)
-        await message.answer("Send me a post you want, I will pass it to Admins")
+    await state.set_state(Form.name)
+    await message.answer("Send me a post you want, I will pass it to Admins")
 
 
 @router.message(Form.name)

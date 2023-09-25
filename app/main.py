@@ -9,7 +9,7 @@ from aiogram import Bot, Dispatcher
 async def main() -> None:
     bot = Bot(token=Config.TOKEN)
     dp = Dispatcher()
-    await bot.delete_webhook(drop_pending_updates=True)
+    # await bot.delete_webhook(drop_pending_updates=True)
     dp.include_router(start.router)
     dp.include_router(propose.router)
     dp.include_router(members_new.router)
