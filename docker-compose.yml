@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    networks:
+      - backend
+    ports:
+      - "5534:5432"
+    volumes:
+      - /var/lib/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGDATA=/var/lib/postgresql/data
+
+  telegram_bot:
+    build:
+      context: .
+    env_file: .env
+    restart: always
+    networks:
+      - backend
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - ./app:/app
+    depends_on:
+      - db
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+
+networks:
+  backend:

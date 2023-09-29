@@ -1,5 +1,4 @@
-import yaml
-from os import path
+from os import environ
 from typing import get_type_hints, Union
 
 
@@ -11,28 +10,17 @@ def _parse_bool(val: Union[str, bool]) -> bool:
     return val if type(val) is bool else val.lower() in ["true", "yes", "1"]
 
 
-# AppConfig class with required fields, default values, type checking, and typecasting for int and bool values
 class AppConfig:
-    TOKEN: str
+    TELEGRAM_BOT_TOKEN: str
+    ADMIN_LISTS: list = []
     LOG_LEVEL: str = "INFO"
-    ADMIN_LISTS: list = None
-    THANKS_STIKERS: list = None
-    HELLO_MESSAGE: str
-    HELLO_STIKERS: list = None
-    GOODBYE_MESSAGE: str
-    GOODBYE_STIKERS: list = None
 
     def __init__(self, env):
         for field in self.__annotations__:
-            if not field.isupper():
-                continue
-
-            # Raise AppConfigError if required field not supplied
             default_value = getattr(self, field, None)
             if default_value is None and env.get(field) is None:
                 raise AppConfigError("The {} field is required".format(field))
 
-            # Cast env var value to expected type and raise AppConfigError on failure
             try:
                 var_type = get_type_hints(AppConfig)[field]
                 if var_type == bool:
@@ -52,7 +40,4 @@ class AppConfig:
         return str(self.__dict__)
 
 
-# Expose Config object for app to import
-BASE_DIR = path.abspath(path.dirname(__file__))
-with open(path.join(BASE_DIR, "config.yml"), encoding='utf-8') as file:
-    Config = AppConfig(yaml.safe_load(file))
+Config = AppConfig(environ)

@@ -1,12 +1,13 @@
-FROM python:3.11
+FROM python:3.11-alpine
 
 WORKDIR /app
 
-RUN apt-get -y update
-
-RUN apt-get -y install git gcc python3-dev
-
 COPY requirements.txt .
+
+RUN apk update && apk add --no-cache \
+    build-base \
+    libpq-dev \
+    python3-dev
 
 RUN pip3 install -r requirements.txt
 
