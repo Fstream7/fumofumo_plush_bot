@@ -7,7 +7,7 @@ services:
     networks:
       - backend
     ports:
-      - "5534:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - /var/lib/postgres:/var/lib/postgresql/data
     environment:

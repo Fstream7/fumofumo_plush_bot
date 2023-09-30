@@ -1,43 +1,38 @@
-from os import environ
-from typing import get_type_hints, Union
+from pydantic import SecretStr, model_validator, AnyUrl
+from pydantic_settings import BaseSettings
+from typing import Optional, Tuple, List
 
 
-class AppConfigError(Exception):
-    pass
-
-
-def _parse_bool(val: Union[str, bool]) -> bool:
-    return val if type(val) is bool else val.lower() in ["true", "yes", "1"]
-
-
-class AppConfig:
-    TELEGRAM_BOT_TOKEN: str
-    ADMIN_LISTS: list = []
+class Settings(BaseSettings):
+    TELEGRAM_BOT_TOKEN: SecretStr
+    ADMIN_ID: Optional[int] = None
     LOG_LEVEL: str = "INFO"
+    DATABASE_URI: Optional[AnyUrl] = None
+    POSTGRES_HOST: str = "localhost"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_DB: Optional[str] = None
+    POSTGRES_USER: Optional[str] = None
+    POSTGRES_PASSWORD: Optional[SecretStr] = None
 
-    def __init__(self, env):
-        for field in self.__annotations__:
-            default_value = getattr(self, field, None)
-            if default_value is None and env.get(field) is None:
-                raise AppConfigError("The {} field is required".format(field))
-
-            try:
-                var_type = get_type_hints(AppConfig)[field]
-                if var_type == bool:
-                    value = _parse_bool(env.get(field, default_value))
-                else:
-                    value = var_type(env.get(field, default_value))
-
-                self.__setattr__(field, value)
-            except ValueError:
-                raise AppConfigError(
-                    'Unable to cast value of "{}" to type "{}" for "{}" field'.format(
-                        env[field], var_type, field
-                    )
+    @model_validator(mode="after")
+    def validate_db_uri(self) -> "Settings":
+        if self.DATABASE_URI is None:
+            if (
+                self.DATABASE_URI is None
+                and self.POSTGRES_DB is not None
+                and self.POSTGRES_USER is not None
+                and self.POSTGRES_PASSWORD is not None
+            ):
+                self.DATABASE_URI = "postgresql+asyncpg://{username}:{password}@{host}:{port}/{database}".format(
+                    username=self.POSTGRES_USER,
+                    password=self.POSTGRES_PASSWORD.get_secret_value(),
+                    host=self.POSTGRES_HOST,
+                    port=self.POSTGRES_PORT,
+                    database=self.POSTGRES_DB,
                 )
+            else:
+                self.DATABASE_URI = "sqlite+aiosqlite:///db.sqlite"
+            return self
 
-    def __repr__(self):
-        return str(self.__dict__)
 
-
-Config = AppConfig(environ)
+Config = Settings()
