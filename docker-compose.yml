@@ -24,7 +24,6 @@ services:
     networks:
       - backend
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
       - ./app:/app
     depends_on:
       - db

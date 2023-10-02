@@ -1,18 +1,19 @@
-from pydantic import SecretStr, model_validator, AnyUrl
+from pydantic import SecretStr, model_validator
 from pydantic_settings import BaseSettings
-from typing import Optional, Tuple, List
+from typing import Optional
 
 
 class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: SecretStr
     ADMIN_ID: Optional[int] = None
     LOG_LEVEL: str = "INFO"
-    DATABASE_URI: Optional[AnyUrl] = None
+    DATABASE_URI: Optional[str] = None
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
+    TZ: str = "UTC"
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":

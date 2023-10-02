@@ -1,5 +1,5 @@
 from .base import Base
-from .models import PlayerScore
+from .models import media_users
 
 __all__ = [
     "Base",
