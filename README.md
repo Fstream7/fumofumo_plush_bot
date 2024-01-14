@@ -12,7 +12,9 @@ Silly telegram bot
 ```
 Create postgres database and fill all data
 pip3 install -U -r requirements.txt
-python3 app/main.py
+cd app/
+alembic upgrade head
+python3 main.py
 ```
 
 # Run with docker
