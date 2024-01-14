@@ -14,7 +14,8 @@ class media_users(Base):
 
     def __repr__(self):
         desired_timezone = pytz.timezone(Config.TZ)
-        return f"id: {self.id}, user_id: {self.user_id}, username: {self.username}, date added: {self.timestamp_column.astimezone(desired_timezone)}"
+        return f"id: {self.id}, user_id: {self.user_id}, \
+            username: {self.username}, date added: {self.timestamp_column.astimezone(desired_timezone)}"
 
 
 class media(Base):
@@ -28,7 +29,8 @@ class media(Base):
 
     def __repr__(self):
         desired_timezone = pytz.timezone(Config.TZ)
-        return f"id: {self.id}, media_type: {self.media_type}, media_file_id: {self.media_file_id}, user_id: {self.user_id}, date added: {self.timestamp_column.astimezone(desired_timezone)}"
+        return f"id: {self.id}, media_type: {self.media_type}, media_file_id: {self.media_file_id}, \
+            user_id: {self.user_id}, date added: {self.timestamp_column.astimezone(desired_timezone)}"
 
 
 class phrases(Base):
