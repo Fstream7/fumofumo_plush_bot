@@ -1,22 +1,29 @@
 # fumofumo_plush_bot
 Silly telegram bot 
 
-# How to setup
+## environment variables
 
-- `git clone https://github.com/Fstream/fumofumo_plush_bot`
-- `cd fumofumo_plush_bot`
-- `cp .env.example .env`
-- *Fill in all the vars. To get ADMIN_CHAT_ID start bot and send him /id command*
-- *Optional - fill values in app/messages.py. To get sticker id start bot and send him any sticker from admin. user_full_name will be replaced with user full name*
+- `TELEGRAM_BOT_TOKEN=Your_token`
+- `LOG_LEVEL=INFO` #loglevel
+- `ADMIN_CHAT_ID=238637902` #To get ADMIN_CHAT_ID start bot and send him /id command*
 
-# Start with local python:
+#### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
+#### To get sticker id start bot and send him /get_stickers_id command from admin. 
+
+### Run with docker in test mode
 ```
-pip3 install -U -r requirements.txt
-cd app/
-python3 main.py
+docker run -it --rm \
+--env TELEGRAM_BOT_TOKEN="Your_token" \
+--env ADMIN_CHAT_ID=238637902 \
+ghcr.io/fstream7/fumofumo_plush_bot:main
 ```
 
-# or run with docker
+### Run with docker in detach/daemon mode
 ```
-docker compose up
+docker run --detach --restart=always \
+--env TELEGRAM_BOT_TOKEN="Your_token" \
+--env ADMIN_CHAT_ID=238637902 \
+--name fumofumo_plush_bot \
+ghcr.io/fstream7/fumofumo_plush_bot:main
 ```
+ Or clone repo and use python/docker compose

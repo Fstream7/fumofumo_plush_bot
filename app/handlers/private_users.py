@@ -2,7 +2,6 @@ from aiogram import Router, F, types, Bot
 from aiogram.methods import ForwardMessages
 from config import Config
 from filters.chat_type import ChatTypeFilter
-
 from typing import List
 from decorators.media_group_handler import media_group_handler
 from config import Messages
