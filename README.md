@@ -1,5 +1,5 @@
 # fumofumo_plush_bot
-Silly telegram bot 
+Silly telegram bot. Will welcome new users in the group and notify if someone has left. Users can propose posts to the channel with private messages.
 
 ## environment variables
 
