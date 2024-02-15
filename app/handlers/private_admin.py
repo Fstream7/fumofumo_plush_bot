@@ -1,9 +1,9 @@
 from aiogram import Router, F
 from aiogram.types import Message
-from filters.chat_type import ChatTypeFilter
+from filters.admin import AdminFilter
 
 router = Router()
-router.message.filter(ChatTypeFilter(chat_type=["private"]))
+router.message.filter(AdminFilter())
 
 
 @router.message(F.sticker)

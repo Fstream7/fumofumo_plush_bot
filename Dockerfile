@@ -13,6 +13,4 @@ RUN pip3 install -r requirements.txt
 
 COPY app/ .
 
-RUN alembic upgrade head
-
 CMD [ "python3", "main.py"]

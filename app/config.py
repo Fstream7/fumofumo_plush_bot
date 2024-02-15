@@ -1,39 +1,27 @@
-from pydantic import SecretStr, model_validator
+import yaml
+from pydantic import SecretStr, BaseModel
 from pydantic_settings import BaseSettings
 from typing import Optional
+
+with open('messages.yml', 'r') as stream1:
+    messages_kwargs = yaml.safe_load(stream1)
+
+
+class messages(BaseModel):
+    welcome_message: str = None
+    thanks_message: str = None
+    thanks_sticker: list[str] = []
+    new_member_message: str = None
+    new_member_sticker: list[str] = []
+    left_member_message: str = None
+    left_member_sticker: list[str] = []
 
 
 class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: SecretStr
-    ADMIN_ID: Optional[int] = None
+    ADMIN_CHAT_ID: Optional[int] = None
     LOG_LEVEL: str = "INFO"
-    DATABASE_URI: Optional[str] = None
-    POSTGRES_HOST: str = "localhost"
-    POSTGRES_PORT: int = 5432
-    POSTGRES_DB: Optional[str] = None
-    POSTGRES_USER: Optional[str] = None
-    POSTGRES_PASSWORD: Optional[SecretStr] = None
-    TZ: str = "UTC"
-
-    @model_validator(mode="after")
-    def validate_db_uri(self) -> "Settings":
-        if self.DATABASE_URI is None:
-            if (
-                self.DATABASE_URI is None
-                and self.POSTGRES_DB is not None
-                and self.POSTGRES_USER is not None
-                and self.POSTGRES_PASSWORD is not None
-            ):
-                self.DATABASE_URI = "postgresql+asyncpg://{username}:{password}@{host}:{port}/{database}".format(
-                    username=self.POSTGRES_USER,
-                    password=self.POSTGRES_PASSWORD.get_secret_value(),
-                    host=self.POSTGRES_HOST,
-                    port=self.POSTGRES_PORT,
-                    database=self.POSTGRES_DB,
-                )
-            else:
-                self.DATABASE_URI = "sqlite+aiosqlite:///db.sqlite"
-            return self
 
 
 Config = Settings()
+Messages = messages(**messages_kwargs)
