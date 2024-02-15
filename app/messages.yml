@@ -8,7 +8,7 @@ thanks_sticker:
   - CAACAgIAAxkBAAPoZRD1CHcrtFXxnDPz_7xWdVJ3gIAAAmsPAAK-szFLPqniW1UzO6cwBA
   - CAACAgIAAxkBAAPqZRD1JvNuYpszjfLwCqTOt_ld9_oAAhUjAAKRKlBKjqFPrejpn7kwBA
 
-new_member_message: f"Hello, {user_full_name}, read the rules in group description"
+new_member_message: "Hello, {user_full_name}, read the rules in group description"
 new_member_sticker:
   - CAACAgIAAxkBAAIBNWURDvuxhT0vyCU3lQ8mgcXq9HvOAAJGDAACaxlYSnsuqbefOaqFMAQ
   - CAACAgUAAxkBAAIBN2URDwusbf2WYg4VUYGP9ndtF2I8AALsCAAC8bOxVsrcu--rZPA1MAQ
@@ -16,7 +16,7 @@ new_member_sticker:
   - CAACAgQAAxkBAAIBO2URDyyf4jfHEpUu1C4p_X64A-UpAAKGCgACnA8hUFPsN6KDkvltMAQ
   - CAACAgIAAxkBAAIBPWURD1ZHh-Dn8CbP3ZLR19iBkAEvAAKHLQAC6OcRS-qxKdoUxdgdMAQ
 
-left_member_message: f"Fumo fren no more, goodbye {user_full_name}"
+left_member_message: "Fumo fren no more, goodbye {user_full_name}"
 left_member_sticker:
   - CAACAgIAAxkBAAIBP2URD2su4idILHCpEVniQJ2ItvF4AAIrDwACxx24SqWKrif9QzgWMAQ
   - CAACAgIAAxkBAAIBQWURD5F2lvBOtQZ-kb_hYJUkeBi0AAK6JgACa9BYShGQ3ksaTfYvMAQ
