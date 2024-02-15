@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  telegram_bot:
+    image:  ghcr.io/fstream7/fumofumo_plush_bot:main
+    restart: always
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
