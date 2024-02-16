@@ -10,9 +10,12 @@ from random import choice
 router = Router()
 
 
-@router.message(ChatTypeFilter(chat_type=["private"]), F.media_group_id, F.content_type.in_({'photo', 'video'}))
+@router.message(
+    ChatTypeFilter(chat_type=["private"]),
+    F.media_group_id,
+    F.content_type.in_({'photo', 'video', 'audio', 'document'}))
 @media_group_handler
-async def album_handler(messages: List[types.Message], bot: Bot) -> None:
+async def media_group(messages: List[types.Message], bot: Bot) -> None:
     await bot(ForwardMessages(chat_id=Config.ADMIN_CHAT_ID,
                               from_chat_id=messages[-1].chat.id,
                               message_ids=[message.message_id for message in messages]))

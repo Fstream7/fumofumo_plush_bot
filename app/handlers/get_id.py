@@ -1,5 +1,6 @@
 from aiogram.filters import Command
 from aiogram import Router, types
+from random import choice
 
 router = Router()
 
@@ -11,4 +12,4 @@ async def return_id(message: types.Message) -> None:
 
 @router.message(Command("fumo"))
 async def fumo(message: types.Message) -> None:
-    await message.reply("Fumo ᗜᴗᗜ")
+    await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ'])}")
