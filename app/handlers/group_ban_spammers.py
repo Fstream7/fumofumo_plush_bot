@@ -21,3 +21,4 @@ async def ban_spammers(message: types.Message) -> None:
                 await message.delete()
             except Exception as err:
                 await message.answer(str(err))
+            break
