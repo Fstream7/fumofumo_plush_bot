@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from handlers import get_id, group_member_left, group_member_new, private_admin, private_users, start, group_ban_spammers
+from handlers import get_id, group_member_left, group_member_new, private_admin, private_users, start
+from handlers import group_ban_spammers
 from config import Config
 import asyncio
 import logging
