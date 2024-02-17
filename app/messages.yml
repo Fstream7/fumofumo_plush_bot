@@ -35,3 +35,10 @@ left_member_sticker:
   - CAACAgIAAxkBAAIDXWXOeR3i-LTiWuYQ1eJ6vB8V6p3CAAI7HwACwhDASBSs1quEBVdMNAQ
   - CAACAgIAAxkBAAIDZ2XOeaifJfdnTnrD0rQrms9YZHi7AAIsGQAC8DgoSF8xxZe8XkDhNAQ
   - CAACAgIAAxkBAAIDbWXOefr1iLHJK25__zwlVZupWOW-AAKYDQACUTlIS8RcRn6BL0VrNAQ
+
+ban_regexs:
+  - https?://(?:www\.)?[\w\-]+\.io(?:/[\w\-./?%&=]*)?
+  - срочно
+  - успеет
+  - забрать
+ban_message: "{user_full_name} got fumoed, reason - {ban_reason}"
