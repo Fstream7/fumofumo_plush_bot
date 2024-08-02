@@ -1,5 +1,5 @@
-aiogram==3.3.0
-asyncio==3.4.3
+aiogram==3.10.0
+asyncio==3.12.4
 pydantic==2.4.1
 pydantic-settings==2.0.3
 PyYAML==6.0.1
