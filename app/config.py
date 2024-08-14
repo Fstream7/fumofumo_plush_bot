@@ -15,8 +15,8 @@ class messages(BaseModel):
     new_member_sticker: list[str] = []
     left_member_message: str = None
     left_member_sticker: list[str] = []
-    ban_regexs: list[str] = []
-    ban_message: str = None
+    ban_member_message: str = None
+    ban_member_sticker: list[str] = []
 
 
 class Settings(BaseSettings):
