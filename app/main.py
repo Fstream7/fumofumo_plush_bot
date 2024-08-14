@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from handlers import get_id, group_member_left, group_member_new, private_admin, private_users, start
-from handlers import group_ban_spammers
+from handlers import group_member_banned
 from config import Config
 import asyncio
 import logging
@@ -16,7 +16,7 @@ async def main() -> None:
     dp.include_router(private_users.router)
     dp.include_router(group_member_new.router)
     dp.include_router(group_member_left.router)
-    dp.include_router(group_ban_spammers.router)
+    dp.include_router(group_member_banned.router)
     await dp.start_polling(bot)
 
 
