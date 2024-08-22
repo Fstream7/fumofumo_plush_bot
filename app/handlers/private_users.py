@@ -18,11 +18,19 @@ router = Router()
 async def media_group(messages: List[types.Message], bot: Bot) -> None:
     await bot.send_message(
         Config.ADMIN_CHAT_ID,
-        f"New message from {messages[-1].from_user.full_name} @{messages[-1].from_user.username}({messages[-1].from_user.id})"
+        (
+            f"New message from {messages[-1].from_user.full_name} "
+            f"@{messages[-1].from_user.username} "
+            f"({messages[-1].from_user.id})"
+        )
     )
-    await bot(ForwardMessages(chat_id=Config.ADMIN_CHAT_ID,
-                              from_chat_id=messages[-1].chat.id,
-                              message_ids=[message.message_id for message in messages]))
+    await bot(
+        ForwardMessages(
+            chat_id=Config.ADMIN_CHAT_ID,
+            from_chat_id=messages[-1].chat.id,
+            message_ids=[message.message_id for message in messages]
+        )
+    )
     await messages[-1].answer(Messages.thanks_message.format(user_full_name=messages[-1].from_user.full_name))
     await messages[-1].answer_sticker(sticker=choice(Messages.thanks_sticker))
 
@@ -31,7 +39,11 @@ async def media_group(messages: List[types.Message], bot: Bot) -> None:
 async def process_propose(message: types.Message, bot: Bot) -> None:
     await bot.send_message(
         Config.ADMIN_CHAT_ID,
-        f"New message from {message.from_user.full_name} @{message.from_user.username}({message.from_user.id})"
+        (
+            f"New message from {message.from_user.full_name} "
+            f"@{message.from_user.username} "
+            f"({message.from_user.id})"
+        )
     )
     await message.forward(Config.ADMIN_CHAT_ID)
     await message.answer(Messages.thanks_message.format(user_full_name=message.from_user.full_name))
