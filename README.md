@@ -20,6 +20,8 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_stickers_id command from admin. 
+#### To get images id start bot and send him /get_images_id command from admin. Images can be found at fumos_images dir. 
+#### Most of the photos were taken from https://fumo.website/
 
 ## Run with docker in test mode
 ```
@@ -38,3 +40,13 @@ docker run --detach --restart=always \
 ghcr.io/fstream7/fumofumo_plush_bot:main
 ```
  Or clone repo and use python/docker compose
+
+
+### Commands:
+ * /id will return current chat id
+ * /fumo will return random fumo face ᗜᴗᗜ
+ * /fumofumo will return fumo of the day based on day and user id. 
+### Admin commands:
+ * /get_stickers_id FSM, will return given sticker id
+ * /get_images_id FSM, will return given photo id
+ * /cancel exit from FSM

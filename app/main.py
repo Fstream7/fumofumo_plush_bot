@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from handlers import get_id, group_member_left, group_member_new, private_admin, private_users, start
+from handlers import get_id, fumofumo, group_member_left, group_member_new, private_admin, private_users, start
 from handlers import group_member_banned
 from config import Config
 import asyncio
@@ -12,6 +12,7 @@ async def main() -> None:
     dp = Dispatcher()
     dp.include_router(start.router)
     dp.include_router(get_id.router)
+    dp.include_router(fumofumo.router)
     dp.include_router(private_admin.router)
     dp.include_router(private_users.router)
     dp.include_router(group_member_new.router)

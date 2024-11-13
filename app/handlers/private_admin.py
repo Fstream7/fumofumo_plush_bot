@@ -13,7 +13,7 @@ class Form(StatesGroup):
 
 
 @router.message(Command("get_stickers_id"), AdminFilter())
-async def cmd_start(message: types.Message, state: FSMContext) -> None:
+async def cmd_start_get_stickers(message: types.Message, state: FSMContext) -> None:
     await state.set_state(Form.name)
     await message.answer("Send me a stickers, I will write their file_id. \nSend /cancel to stop")
 
@@ -21,6 +21,18 @@ async def cmd_start(message: types.Message, state: FSMContext) -> None:
 @router.message(Form.name, F.sticker)
 async def message_with_sticker(message: Message):
     await message.answer(f"Sticker file_id {message.sticker.file_id}")
+
+
+@router.message(Command("get_images_id"), AdminFilter())
+async def cmd_start_get_images(message: types.Message, state: FSMContext) -> None:
+    await state.set_state(Form.name)
+    await message.answer("Send me a images, I will write their file_id. \nSend /cancel to stop")
+
+
+@router.message(Form.name, F.photo)
+async def message_with_image(message: Message):
+    print(message)
+    await message.answer(message.photo[0].file_id)
 
 
 @router.message(Form.name, Command("cancel"))
