@@ -17,6 +17,8 @@ class messages(BaseModel):
     left_member_sticker: list[str] = []
     ban_member_message: str = None
     ban_member_sticker: list[str] = []
+    fumofumo_message: str = None
+    fumofumo_fumos: list[object] = []
 
 
 class Settings(BaseSettings):
