@@ -2,6 +2,8 @@ from aiogram import Router, F, types, Bot
 from aiogram.methods import ForwardMessages
 from config import Config
 from filters.chat_type import ChatTypeFilter
+from filters.admin import AdminFilter
+from aiogram.filters import invert_f
 from typing import List
 from decorators.media_group_handler import media_group_handler
 from config import Messages
@@ -12,6 +14,7 @@ router = Router()
 
 @router.message(
     ChatTypeFilter(chat_type=["private"]),
+    invert_f(AdminFilter()),
     F.media_group_id,
     F.content_type.in_({'photo', 'video', 'audio', 'document'}))
 @media_group_handler
@@ -35,7 +38,7 @@ async def media_group(messages: List[types.Message], bot: Bot) -> None:
     await messages[-1].answer_sticker(sticker=choice(Messages.thanks_sticker))
 
 
-@router.message(ChatTypeFilter(chat_type=["private"]))
+@router.message(ChatTypeFilter(chat_type=["private"]), invert_f(AdminFilter()))
 async def process_propose(message: types.Message, bot: Bot) -> None:
     await bot.send_message(
         Config.ADMIN_CHAT_ID,
