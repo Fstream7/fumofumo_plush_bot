@@ -42,14 +42,3 @@ ban_member_sticker:
   - CAACAgEAAxkBAAIGXGa86B8meDkAAToWyanIbh55w94lwwACAwADUypEPCIiz7NiEMoaNQQ
 
 fumofumo_message: "Your fumo of the day is {fumo}"
-fumofumo_fumos:
-  - name: Hakurei Reimu Version 1 ᗜ_ᗜ
-    picture_id: AgACAgIAAxkBAAIHv2c05nAUCmNP6aBUOJkH1QpqbI87AAKd5TEb1yGgSb8dd0n-YAqqAQADAgADcwADNgQ
-  - name: Blue Hakurei Reimu ᗜ_ᗜ
-    picture_id: AgACAgIAAxkBAAIHyGc05ssIp09Q4IiTRqv2X3g8sFy5AAI14jEb1yGoSdQmiK3rcJ7qAQADAgADcwADNgQ
-  - name: Kirisame Marisa ᗜᴗᗜ
-    picture_id: AgACAgIAAxkBAAIHymc053pgG5m2IfNvuUUDeApSo67AAAI44jEb1yGoSU8J2bQR9Q93AQADAgADcwADNgQ
-  - name: Hinanawi Tenshi ᗜᴗᗜ
-    picture_id: AgACAgIAAxkBAAIHzGc05_eI5uBx3HjotHT1VK7qGC_YAAI74jEb1yGoSW4l_qQdb19EAQADAgADcwADNgQ
-  - name: Yorigami Shion ᗜ_ᗜ
-    picture_id: AgACAgIAAxkBAAIHzmc06LG1vyvObVG8LVnsT0HPQPBmAAJK4jEb1yGoSfHJBjBgSO-FAQADAgADcwADNgQ

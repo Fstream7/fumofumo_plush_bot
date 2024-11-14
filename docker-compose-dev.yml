@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+
+  telegram_bot:
+    build:
+      context: .
+    restart: always
+    volumes:
+      - ./app:/app
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
