@@ -5,8 +5,12 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 def edit_buttons() -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder()
     keyboard.button(
-        text="edit",
-        callback_data="edit_fumo"
+        text="edit name",
+        callback_data="edit_fumo_name"
+    )
+    keyboard.button(
+        text="replace image",
+        callback_data="edit_fumo_image"
     )
     keyboard.button(
         text="delete",

@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from .models import Fumo
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from typing import Optional
 
 _fumo_ids_cache = None
@@ -47,6 +47,26 @@ async def db_delete_fumo_by_name(session: AsyncSession, fumo_name: str) -> str:
         await session.execute(delete(Fumo).where(Fumo.name == fumo_name))
         await session.commit()
         return f"Fumo {fumo_name} deleted."
+    except SQLAlchemyError as e:
+        await session.rollback()
+        return f"Error occurred: {str(e)}"
+
+
+async def db_update_fumo_name(session: AsyncSession, old_fumo_name: str, new_fumo_name: str) -> str:
+    try:
+        await session.execute(update(Fumo).where(Fumo.name == old_fumo_name).values(name=new_fumo_name))
+        await session.commit()
+        return f"{new_fumo_name} name updated."
+    except SQLAlchemyError as e:
+        await session.rollback()
+        return f"Error occurred: {str(e)}"
+
+
+async def db_update_fumo_file_id_by_name(session: AsyncSession, fumo_name: str, new_fumo_file_id: str) -> str:
+    try:
+        await session.execute(update(Fumo).where(Fumo.name == fumo_name).values(file_id=new_fumo_file_id))
+        await session.commit()
+        return f"{fumo_name} image updated."
     except SQLAlchemyError as e:
         await session.rollback()
         return f"Error occurred: {str(e)}"

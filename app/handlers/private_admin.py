@@ -7,7 +7,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command, CommandObject
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.requests import db_add_fumo, update_fumo_ids_cache, db_show_all_fumos, db_search_fumos_by_name
-from db.requests import db_delete_fumo_by_name
+from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
 from aiogram.filters import and_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 
@@ -18,7 +18,8 @@ class Form(StatesGroup):
     get_stickers_id = State()
     add_fumo = State()
     remove_fumo = State()
-    edit_fumo = State()
+    edit_fumo_name = State()
+    edit_fumo_image = State()
 
 
 @router.message(Command("cancel"))
@@ -107,3 +108,49 @@ async def delete_fumo_from_db_cancel(callback: types.CallbackQuery, state: FSMCo
     await callback.message.delete()
     await state.clear()
     await callback.answer()
+
+
+@router.callback_query(F.data == "edit_fumo_name")
+async def cmd_edit_fumo_name(callback: types.CallbackQuery, state: FSMContext):
+    fumo_name = callback.message.caption
+    await state.set_state(Form.edit_fumo_name)
+    await state.update_data(fumo_to_edit=fumo_name)
+    await callback.message.answer(
+        f"Send me a new name for {fumo_name}. I will update it in the database.\n"
+        "Send /cancel to stop."
+    )
+    await callback.answer()
+
+
+@router.message(Form.edit_fumo_name)
+async def edit_fumo_name(message: Message, session: AsyncSession, state: FSMContext):
+    user_data = await state.get_data()
+    old_fumo_name = user_data['fumo_to_edit']
+    new_fumo_name = message.text
+    result = await db_update_fumo_name(session, old_fumo_name, new_fumo_name)
+    await message.reply(result)
+    await state.clear()
+    await update_fumo_ids_cache(session)
+
+
+@router.callback_query(F.data == "edit_fumo_image")
+async def cmd_edit_fumo_image(callback: types.CallbackQuery, state: FSMContext):
+    fumo_name = callback.message.caption
+    await state.set_state(Form.edit_fumo_image)
+    await state.update_data(fumo_to_edit=fumo_name)
+    await callback.message.answer(
+        f"Send me a new image for {fumo_name}. I will update it in the database.\n"
+        "Send /cancel to stop."
+    )
+    await callback.answer()
+
+
+@router.message(Form.edit_fumo_image, F.photo)
+async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMContext):
+    user_data = await state.get_data()
+    fumo_name = user_data['fumo_to_edit']
+    new_fumo_file_id = message.photo[0].file_id
+    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id)
+    await message.reply(result)
+    await state.clear()
+    await update_fumo_ids_cache(session)
