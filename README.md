@@ -9,9 +9,9 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 ## Used technologies
 * Python 3.11 with asyncio, data validation and typing
 * aiogram 3
-* sqlalchemy asyncio wth slite for development or postgres for production
+* sqlalchemy asyncio wth SQLite for development or Postgres for production
 * Docker and Docker Compose
-* Github workflow linter and build
+* GitHub  workflow linter and build
 
 ## environment variables
 ### required:
@@ -22,7 +22,7 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_stickers_id command from admin. 
-#### To add fumos to db start bot and send him /add_fumos command from admin. Send fumo images with names. Telegram allows to share stickers between bots, but each bot has a unique file_id for other media, so you have to re-upload them. 
+#### To add fumos to db start bot and send him /add_fumos command from admin. Send fumo images with names. Telegram allows sharing  stickers between bots, but each bot has a unique file_id for other media, so you have to re-upload them. 
 
 ## Run container
 ```bash
@@ -70,4 +70,4 @@ docker compose -f docker-compose.yml up -d
  * /get_stickers_id FSM, will return given sticker id
  * /add_fumo FSM for adding fumos to db
  * /cancel exit from FSM
- * /list_fumos show all fumos from db.
+ * /list_fumos list fumos by name in db.
