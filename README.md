@@ -51,11 +51,15 @@ git clone git@github.com:Fstream7/fumofumo_plush_bot.git
 export TELEGRAM_BOT_TOKEN="Your_token"
 export ADMIN_CHAT_ID=238637902
 ```
-3. Run with local python of docker compose
+3. Run with local python
 ```bash
-cd app/; python main.py
+pip3 install requirements.txt
+cd app/
 alembic upgrade head
-# or
+python main.py
+```
+Or with docker compose
+```bash
 # for development, with sqlite
 docker compose -f docker-compose-dev.yml up
 # for production, with postgres
