@@ -17,8 +17,14 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 ### required:
 - `TELEGRAM_BOT_TOKEN=Your_token`
 ### optional:
-- `LOG_LEVEL=INFO` #loglevel
-- `ADMIN_CHAT_ID=238637902` #To get ADMIN_CHAT_ID start bot and send him /id command*
+- `LOG_LEVEL=INFO` loglevel
+- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
+### env for postgres (if they are not specified, then sqlite will be used):
+- `POSTGRES_HOST` postgress db host
+- `POSTGRES_PORT`  postgress db port
+- `POSTGRES_DB` postgress db name
+- `POSTGRES_USER` postgress db user
+- `POSTGRES_PASSWORD` postgress db password
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_stickers_id command from admin. 
