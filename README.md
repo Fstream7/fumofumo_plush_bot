@@ -14,9 +14,7 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 * GitHub  workflow linter and build
 
 ## environment variables
-### required:
 - `TELEGRAM_BOT_TOKEN=Your_token`
-### optional:
 - `LOG_LEVEL=INFO` loglevel
 - `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
 ### env for postgres (if they are not specified, then sqlite will be used):
@@ -73,11 +71,12 @@ docker compose -f docker-compose.yml up -d
 ```
 
 ### Commands:
- * /id will return current chat id
- * /fumo will return random fumo face ᗜᴗᗜ
- * /fumofumo will return fumo of the day based on day and user id. 
+ - `/id` will return current chat id
+ - `/fumo` will return random fumo face ᗜᴗᗜ
+ - `/fumofumo` will return fumo of the day based on day and user id. 
 ### Admin commands:
- * /get_stickers_id FSM, will return given sticker id
- * /add_fumo FSM for adding fumos to db
- * /cancel exit from FSM
- * /list_fumos list fumos by name in db.
+ - `/get_stickers_id` FSM, will return given sticker id
+ - `/add_fumo` FSM for adding fumos to db
+ - `/cancel` exit from FSM
+ - `/list_fumos` list all fumos in db.
+ - `/list_fumos name` list fumos by name in db.
