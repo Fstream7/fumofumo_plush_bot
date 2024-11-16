@@ -15,7 +15,7 @@ async def fumo(message: types.Message) -> None:
 
 @router.message(Command("fumofumo"))
 async def fumofumo(message: types.Message, session: AsyncSession) -> None:
-    fumo_id = message.from_user.id + int(message.date.strftime('%Y%m%d'))
+    fumo_id = message.from_user.id * int(message.date.strftime('%Y%m%d'))
     fumo = await db_get_fumo_by_id(session, fumo_id)
     await message.reply_photo(
         photo=fumo.file_id,
