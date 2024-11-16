@@ -14,11 +14,15 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 * GitHub  workflow linter and build
 
 ## environment variables
-### required:
 - `TELEGRAM_BOT_TOKEN=Your_token`
-### optional:
-- `LOG_LEVEL=INFO` #loglevel
-- `ADMIN_CHAT_ID=238637902` #To get ADMIN_CHAT_ID start bot and send him /id command*
+- `LOG_LEVEL=INFO` loglevel
+- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
+### env for postgres (if they are not specified, then sqlite will be used):
+- `POSTGRES_HOST` postgress db host
+- `POSTGRES_PORT`  postgress db port
+- `POSTGRES_DB` postgress db name
+- `POSTGRES_USER` postgress db user
+- `POSTGRES_PASSWORD` postgress db password
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_stickers_id command from admin. 
@@ -51,11 +55,15 @@ git clone git@github.com:Fstream7/fumofumo_plush_bot.git
 export TELEGRAM_BOT_TOKEN="Your_token"
 export ADMIN_CHAT_ID=238637902
 ```
-3. Run with local python of docker compose
+3. Run with local python
 ```bash
-cd app/; python main.py
+pip3 install requirements.txt
+cd app/
 alembic upgrade head
-# or
+python main.py
+```
+Or with docker compose
+```bash
 # for development, with sqlite
 docker compose -f docker-compose-dev.yml up
 # for production, with postgres
@@ -63,11 +71,12 @@ docker compose -f docker-compose.yml up -d
 ```
 
 ### Commands:
- * /id will return current chat id
- * /fumo will return random fumo face ᗜᴗᗜ
- * /fumofumo will return fumo of the day based on day and user id. 
+ - `/id` will return current chat id
+ - `/fumo` will return random fumo face ᗜᴗᗜ
+ - `/fumofumo` will return fumo of the day based on day and user id. 
 ### Admin commands:
- * /get_stickers_id FSM, will return given sticker id
- * /add_fumo FSM for adding fumos to db
- * /cancel exit from FSM
- * /list_fumos list fumos by name in db.
+ - `/get_stickers_id` FSM, will return given sticker id
+ - `/add_fumo` FSM for adding fumos to db
+ - `/cancel` exit from FSM
+ - `/list_fumos` list all fumos in db.
+ - `/list_fumos name` list fumos by name in db.
