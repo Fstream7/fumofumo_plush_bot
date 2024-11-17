@@ -22,6 +22,7 @@ async def update_fumo_ids_cache(session: AsyncSession) -> None:
     global _fumo_ids_cache
     result = await session.execute(select(Fumo.id).order_by(Fumo.id))
     _fumo_ids_cache = [row[0] for row in result.all()]
+    await session.close()
 
 
 async def db_get_fumo_by_id(session: AsyncSession, id: int) -> Fumo:

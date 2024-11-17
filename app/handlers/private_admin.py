@@ -69,7 +69,6 @@ async def add_fumo(message: Message, session: AsyncSession):
         fumo_link = message.caption_entities[0].url
     result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
     await message.reply(result)
-    await update_fumo_ids_cache(session)
 
 
 @router.message(Form.add_fumo)
@@ -96,12 +95,16 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
 
 @router.callback_query(F.data == "delete_fumo")
 async def cmd_delete_fumo_from_db(callback: types.CallbackQuery, state: FSMContext):
+    """
+    Allow user to cancel any action
+    """
     fumo_name = callback.message.caption
     await state.set_state(Form.remove_fumo)
     await state.update_data(fumo_to_delete=fumo_name)
     await state.update_data(message_to_delete=callback.message)
     await callback.message.answer(
-        f"You are about to delete fumo {fumo_name}. Is that correct?",
+        f"You are about to delete fumo {fumo_name}. Is that correct?\n"
+        "⚠️Warning, fumo id cache will be rebuilded.⚠️",
         reply_markup=confirm_buttons()
     )
     await callback.answer()
@@ -147,7 +150,6 @@ async def edit_fumo_name(message: Message, session: AsyncSession, state: FSMCont
     result = await db_update_fumo_name(session, old_fumo_name, new_fumo_name)
     await message.reply(result)
     await state.clear()
-    await update_fumo_ids_cache(session)
 
 
 @router.callback_query(F.data == "edit_fumo_image")
@@ -170,7 +172,6 @@ async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMCon
     result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id)
     await message.reply(result)
     await state.clear()
-    await update_fumo_ids_cache(session)
 
 
 @router.callback_query(F.data == "edit_fumo_source_link")
@@ -193,7 +194,6 @@ async def edit_fumo_source_link(message: Message, session: AsyncSession, state: 
     result = await db_update_fumo_source_link_by_name(session, fumo_name, new_fumo_source_link)
     await message.reply(result)
     await state.clear()
-    await update_fumo_ids_cache(session)
 
 
 @router.message(Form.edit_fumo_source_link)
