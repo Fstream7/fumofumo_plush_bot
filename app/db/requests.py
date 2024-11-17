@@ -7,9 +7,9 @@ from typing import Optional
 _fumo_ids_cache = None
 
 
-async def db_add_fumo(session: AsyncSession, name: str, file_id: str) -> str:
+async def db_add_fumo(session: AsyncSession, name: str, file_id: str, source_link: Optional[str]) -> str:
     try:
-        fumo = Fumo(name=name, file_id=file_id)
+        fumo = Fumo(name=name, file_id=file_id, source_link=source_link)
         session.add(fumo)
         await session.commit()
         return f"Fumo {name} added successfully."
@@ -67,6 +67,16 @@ async def db_update_fumo_file_id_by_name(session: AsyncSession, fumo_name: str, 
         await session.execute(update(Fumo).where(Fumo.name == fumo_name).values(file_id=new_fumo_file_id))
         await session.commit()
         return f"{fumo_name} image updated."
+    except SQLAlchemyError as e:
+        await session.rollback()
+        return f"Error occurred: {str(e)}"
+
+
+async def db_update_fumo_source_link_by_name(session: AsyncSession, fumo_name: str, new_source_link: str) -> str:
+    try:
+        await session.execute(update(Fumo).where(Fumo.name == fumo_name).values(source_link=new_source_link))
+        await session.commit()
+        return f"{fumo_name} url updated."
     except SQLAlchemyError as e:
         await session.rollback()
         return f"Error occurred: {str(e)}"

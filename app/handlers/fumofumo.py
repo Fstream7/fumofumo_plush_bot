@@ -4,6 +4,7 @@ from config import Messages
 from random import choice
 from db.requests import db_get_fumo_by_id
 from sqlalchemy.ext.asyncio import AsyncSession
+from aiogram.enums import ParseMode
 
 router = Router()
 
@@ -19,4 +20,5 @@ async def fumofumo(message: types.Message, session: AsyncSession) -> None:
     fumo = await db_get_fumo_by_id(session, fumo_id)
     await message.reply_photo(
         photo=fumo.file_id,
-        caption=Messages.fumofumo_message.format(fumo=fumo.name))
+        caption=Messages.fumofumo_message.format(fumo=f"[{fumo.name}]({fumo.source_link})"),
+        parse_mode=ParseMode.MARKDOWN_V2)

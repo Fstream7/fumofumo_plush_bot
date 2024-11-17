@@ -3,7 +3,7 @@ from aiogram.types import BotCommand, BotCommandScopeChat
 from config import Config
 
 
-async def set_commands_for_admins(bot: Bot):
+async def set_commands_for_admins(bot: Bot) -> None:
     """
     Set custom commands for admins
     """

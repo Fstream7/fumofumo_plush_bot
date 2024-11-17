@@ -7,3 +7,4 @@ class Fumo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True)
     file_id = Column(String, unique=True)
+    source_link = Column(String, nullable=True)
