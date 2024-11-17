@@ -80,3 +80,4 @@ docker compose -f docker-compose.yml up -d
  - `/cancel` exit from FSM
  - `/list_fumos` list all fumos in db.
  - `/list_fumos name` list fumos by name in db.
+ - `/update_fumo_cache` Fumos cache updating daily, you can manually update it with this command

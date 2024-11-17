@@ -199,3 +199,9 @@ async def edit_fumo_source_link(message: Message, session: AsyncSession, state: 
 @router.message(Form.edit_fumo_source_link)
 async def edit_fumo_source_link_invalid_input(message: Message):
     await message.reply("Please send new fumo url. \nSend /cancel to cancel")
+
+
+@router.message(Command("update_fumo_cache"))
+async def update_fumo_cache(message: types.Message,  session: AsyncSession) -> None:
+    await update_fumo_ids_cache(session)
+    await message.reply("Cache updated")
