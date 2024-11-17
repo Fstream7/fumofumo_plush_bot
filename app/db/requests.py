@@ -68,7 +68,9 @@ async def db_update_fumo_name(session: AsyncSession, old_fumo_name: str, new_fum
 
 async def db_update_fumo_file_id_by_name(session: AsyncSession, fumo_name: str, new_fumo_file_id: str) -> str:
     try:
-        await session.execute(update(Fumo).where(Fumo.name == escape_markdown(fumo_name)).values(file_id=new_fumo_file_id))
+        await session.execute(update(Fumo).
+                              where(Fumo.name == escape_markdown(fumo_name)).
+                              values(file_id=new_fumo_file_id))
         await session.commit()
         return f"{fumo_name} image updated."
     except SQLAlchemyError as e:
@@ -78,7 +80,9 @@ async def db_update_fumo_file_id_by_name(session: AsyncSession, fumo_name: str, 
 
 async def db_update_fumo_source_link_by_name(session: AsyncSession, fumo_name: str, new_source_link: str) -> str:
     try:
-        await session.execute(update(Fumo).where(Fumo.name == escape_markdown(fumo_name)).values(source_link=new_source_link))
+        await session.execute(update(Fumo).
+                              where(Fumo.name == escape_markdown(fumo_name)).
+                              values(source_link=new_source_link))
         await session.commit()
         return f"{fumo_name} url updated."
     except SQLAlchemyError as e:
