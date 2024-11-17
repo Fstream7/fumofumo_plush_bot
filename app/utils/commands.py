@@ -3,7 +3,7 @@ from aiogram.types import BotCommand, BotCommandScopeChat
 from config import Config
 
 
-async def set_commands_for_admins(bot: Bot):
+async def set_commands_for_admins(bot: Bot) -> None:
     """
     Set custom commands for admins
     """
@@ -15,6 +15,7 @@ async def set_commands_for_admins(bot: Bot):
         BotCommand(command='add_fumo', description='Add fumos to database'),
         BotCommand(command='cancel', description='Cancel any operations'),
         BotCommand(command='list_fumos', description='List fumos by name in db.'),
+        BotCommand(command='update_fumo_cache', description='Mannually update fumo db cache.'),
     ]
     scope = BotCommandScopeChat(chat_id=Config.ADMIN_CHAT_ID)
     await bot.set_my_commands(commands, scope)

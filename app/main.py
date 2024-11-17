@@ -2,6 +2,7 @@
 from handlers import get_id, fumofumo, group_member_left, group_member_new, private_admin, private_users, start
 from handlers import group_member_banned
 from utils.commands import set_commands_for_admins
+from utils.scheduler import setup_scheduler
 from config import Config
 import asyncio
 from middlewares import DbSessionMiddleware
@@ -33,6 +34,7 @@ async def main() -> None:
     dp.include_router(group_member_new.router)
     dp.include_router(group_member_left.router)
     dp.include_router(group_member_banned.router)
+    setup_scheduler(sessionmaker())
     try:
         await dp.start_polling(bot)
     finally:

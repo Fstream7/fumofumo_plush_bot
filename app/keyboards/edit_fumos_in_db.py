@@ -9,6 +9,10 @@ def edit_buttons() -> InlineKeyboardMarkup:
         callback_data="edit_fumo_name"
     )
     keyboard.button(
+        text="edit link",
+        callback_data="edit_fumo_source_link"
+    )
+    keyboard.button(
         text="replace image",
         callback_data="edit_fumo_image"
     )
@@ -16,6 +20,7 @@ def edit_buttons() -> InlineKeyboardMarkup:
         text="delete",
         callback_data="delete_fumo"
     )
+    keyboard.adjust(2)
     return keyboard.as_markup()
 
 
