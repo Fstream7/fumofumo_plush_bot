@@ -95,9 +95,6 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
 
 @router.callback_query(F.data == "delete_fumo")
 async def cmd_delete_fumo_from_db(callback: types.CallbackQuery, state: FSMContext):
-    """
-    Allow user to cancel any action
-    """
     fumo_name = callback.message.caption
     await state.set_state(Form.remove_fumo)
     await state.update_data(fumo_to_delete=fumo_name)
