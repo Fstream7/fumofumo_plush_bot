@@ -1,5 +1,5 @@
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator
+from pydantic import SecretStr, BaseModel, model_validator, Field
 from pydantic_settings import BaseSettings
 from typing import Optional
 
@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
+    HASH_SALT: Optional[SecretStr] = Field("salt", max_length=16)
 
     class Config:
         env_file = ".env"

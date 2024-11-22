@@ -1,10 +1,11 @@
 from aiogram.filters import Command
 from aiogram import Router, types
-from config import Messages
+from config import Messages, Config
 from random import choice
 from db.requests import db_get_fumo_by_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.enums import ParseMode
+import hashlib
 
 router = Router()
 
@@ -16,7 +17,12 @@ async def fumo(message: types.Message) -> None:
 
 @router.message(Command("fumofumo"))
 async def fumofumo(message: types.Message, session: AsyncSession) -> None:
-    fumo_id = message.from_user.id * int(message.date.strftime('%Y%m%d'))
+    fumo_string = f"{message.from_user.id}_{message.date.strftime('%Y%m%d')}"
+    fumo_hash = hashlib.blake2b(fumo_string.encode(),
+                                digest_size=8,
+                                salt=str.encode(Config.HASH_SALT.get_secret_value())
+                                ).hexdigest()
+    fumo_id = int(fumo_hash, 16)
     fumo = await db_get_fumo_by_id(session, fumo_id)
     await message.reply_photo(
         photo=fumo.file_id,
