@@ -1,5 +1,5 @@
 from aiogram import Router, F, types
-from aiogram.types import Message
+from aiogram.types import Message, input_media_photo
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
 from filters.text_is_link import TextIsLinkFilter
@@ -91,7 +91,8 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
             photo=fumo.file_id,
             caption=f"[{fumo.name}]({fumo.source_link})",
             reply_markup=edit_buttons(),
-            parse_mode=ParseMode.MARKDOWN_V2)
+            parse_mode=ParseMode.MARKDOWN_V2
+        )
 
 
 @router.callback_query(F.data == "delete_fumo")
@@ -133,6 +134,7 @@ async def cmd_edit_fumo_name(callback: types.CallbackQuery, state: FSMContext):
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_name)
     await state.update_data(fumo_to_edit=fumo_name)
+    await state.update_data(message_to_edit=callback.message)
     await callback.message.answer(
         f"Send me a new name for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -144,8 +146,17 @@ async def cmd_edit_fumo_name(callback: types.CallbackQuery, state: FSMContext):
 async def edit_fumo_name(message: Message, session: AsyncSession, state: FSMContext):
     user_data = await state.get_data()
     old_fumo_name = user_data['fumo_to_edit']
+    message_to_edit = user_data['message_to_edit']
     new_fumo_name = message.text
     result = await db_update_fumo_name(session, old_fumo_name, new_fumo_name)
+    fumo_link = None
+    if message_to_edit.caption_entities is not None:
+        fumo_link = message_to_edit.caption_entities[0].url
+    await message_to_edit.edit_caption(
+        caption=f"[{new_fumo_name}]({fumo_link})",
+        reply_markup=message_to_edit.reply_markup,
+        parse_mode=ParseMode.MARKDOWN_V2
+    )
     await message.reply(result)
     await state.clear()
 
@@ -155,6 +166,7 @@ async def cmd_edit_fumo_image(callback: types.CallbackQuery, state: FSMContext):
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_image)
     await state.update_data(fumo_to_edit=fumo_name)
+    await state.update_data(message_to_edit=callback.message)
     await callback.message.answer(
         f"Send me a new image for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -166,8 +178,18 @@ async def cmd_edit_fumo_image(callback: types.CallbackQuery, state: FSMContext):
 async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMContext):
     user_data = await state.get_data()
     fumo_name = user_data['fumo_to_edit']
+    message_to_edit = user_data['message_to_edit']
     new_fumo_file_id = message.photo[0].file_id
     result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id)
+    await message_to_edit.edit_media(
+        media=input_media_photo.InputMediaPhoto(
+            type="photo",
+            media=new_fumo_file_id,
+            caption=fumo_name,
+            caption_entities=message_to_edit.caption_entities
+        ),
+        reply_markup=message_to_edit.reply_markup,
+    )
     await message.reply(result)
     await state.clear()
 
@@ -177,6 +199,7 @@ async def cmd_edit_fumo_source_link(callback: types.CallbackQuery, state: FSMCon
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_source_link)
     await state.update_data(fumo_to_edit=fumo_name)
+    await state.update_data(message_to_edit=callback.message)
     await callback.message.answer(
         f"Send me a new link for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -188,8 +211,14 @@ async def cmd_edit_fumo_source_link(callback: types.CallbackQuery, state: FSMCon
 async def edit_fumo_source_link(message: Message, session: AsyncSession, state: FSMContext):
     user_data = await state.get_data()
     fumo_name = user_data['fumo_to_edit']
+    message_to_edit = user_data['message_to_edit']
     new_fumo_source_link = message.text
     result = await db_update_fumo_source_link_by_name(session, fumo_name, new_fumo_source_link)
+    await message_to_edit.edit_caption(
+        caption=f"[{fumo_name}]({new_fumo_source_link})",
+        reply_markup=message_to_edit.reply_markup,
+        parse_mode=ParseMode.MARKDOWN_V2
+    )
     await message.reply(result)
     await state.clear()
 
