@@ -3,6 +3,7 @@ from aiogram.types import Message
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
 from filters.text_is_link import TextIsLinkFilter
+from filters.text_is_command import TextIsCommandFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command, CommandObject
@@ -10,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.requests import db_add_fumo, update_fumo_ids_cache, db_show_all_fumos, db_search_fumos_by_name
 from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
 from db.requests import db_update_fumo_source_link_by_name
-from aiogram.filters import and_f
+from aiogram.filters import and_f, invert_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from aiogram.enums import ParseMode
 
@@ -71,7 +72,7 @@ async def add_fumo(message: Message, session: AsyncSession):
     await message.reply(result)
 
 
-@router.message(Form.add_fumo)
+@router.message(Form.add_fumo, invert_f(TextIsCommandFilter()))
 async def add_fumo_invalid_input(message: Message):
     await message.reply("Please send fumo photo with caption. \nSend /cancel to cancel")
 
@@ -193,7 +194,7 @@ async def edit_fumo_source_link(message: Message, session: AsyncSession, state: 
     await state.clear()
 
 
-@router.message(Form.edit_fumo_source_link)
+@router.message(Form.edit_fumo_source_link, invert_f(TextIsCommandFilter()))
 async def edit_fumo_source_link_invalid_input(message: Message):
     await message.reply("Please send new fumo url. \nSend /cancel to cancel")
 
