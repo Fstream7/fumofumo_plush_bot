@@ -14,6 +14,7 @@ from db.requests import db_update_fumo_source_link_by_name
 from aiogram.filters import and_f, invert_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from aiogram.enums import ParseMode
+from utils.escape_for_markdown import escape_markdown
 
 router = Router()
 router.message.filter(AdminFilter())
@@ -89,7 +90,7 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
     for fumo in fumos:
         await message.answer_photo(
             photo=fumo.file_id,
-            caption=f"[{fumo.name}]({fumo.source_link})",
+            caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
             reply_markup=edit_buttons(),
             parse_mode=ParseMode.MARKDOWN_V2
         )
@@ -153,7 +154,7 @@ async def edit_fumo_name(message: Message, session: AsyncSession, state: FSMCont
     if message_to_edit.caption_entities is not None:
         fumo_link = message_to_edit.caption_entities[0].url
     await message_to_edit.edit_caption(
-        caption=f"[{new_fumo_name}]({fumo_link})",
+        caption=f"[{escape_markdown(new_fumo_name)}]({fumo_link})",
         reply_markup=message_to_edit.reply_markup,
         parse_mode=ParseMode.MARKDOWN_V2
     )
@@ -185,7 +186,7 @@ async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMCon
         media=input_media_photo.InputMediaPhoto(
             type="photo",
             media=new_fumo_file_id,
-            caption=fumo_name,
+            caption=escape_markdown(fumo_name),
             caption_entities=message_to_edit.caption_entities
         ),
         reply_markup=message_to_edit.reply_markup,
@@ -215,7 +216,7 @@ async def edit_fumo_source_link(message: Message, session: AsyncSession, state: 
     new_fumo_source_link = message.text
     result = await db_update_fumo_source_link_by_name(session, fumo_name, new_fumo_source_link)
     await message_to_edit.edit_caption(
-        caption=f"[{fumo_name}]({new_fumo_source_link})",
+        caption=f"[{escape_markdown(fumo_name)}]({new_fumo_source_link})",
         reply_markup=message_to_edit.reply_markup,
         parse_mode=ParseMode.MARKDOWN_V2
     )
