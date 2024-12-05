@@ -15,6 +15,7 @@ from aiogram.filters import and_f, invert_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from aiogram.enums import ParseMode
 from utils.escape_for_markdown import escape_markdown
+import asyncio
 
 router = Router()
 router.message.filter(AdminFilter())
@@ -80,6 +81,11 @@ async def add_fumo_invalid_input(message: Message):
 
 @router.message(Command("list_fumos"))
 async def show_all_fumos(message: types.Message, command: CommandObject, session: AsyncSession) -> None:
+    """
+    List all fumos in db with edit buttons.
+    Sleep 1s after each message to avoid flood
+    https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
+    """
     search_pattern = command.args
     if search_pattern:
         fumos = await db_search_fumos_by_name(session, search_pattern)
@@ -88,12 +94,17 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
     if not fumos:
         await message.answer("No fumos was found in db")
     for fumo in fumos:
-        await message.answer_photo(
-            photo=fumo.file_id,
-            caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
-            reply_markup=edit_buttons(),
-            parse_mode=ParseMode.MARKDOWN_V2
-        )
+        try:
+            await message.answer_photo(
+                photo=fumo.file_id,
+                caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
+                reply_markup=edit_buttons(),
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
+        except Exception as e:
+            await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
+            continue
+        await asyncio.sleep(1)
 
 
 @router.callback_query(F.data == "delete_fumo")
