@@ -1,4 +1,4 @@
-from aiogram import Router, F, types
+from aiogram import Router, F, types, Bot
 from aiogram.types import Message, input_media_photo
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
@@ -16,6 +16,8 @@ from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from aiogram.enums import ParseMode
 from utils.escape_for_markdown import escape_markdown
 import asyncio
+import os
+import logging
 
 router = Router()
 router.message.filter(AdminFilter())
@@ -66,7 +68,7 @@ async def cmd_add_fumo(message: types.Message, state: FSMContext) -> None:
 @router.message(Form.add_fumo, and_f(F.photo, MediaWithCaptionFilter()))
 async def add_fumo(message: Message, session: AsyncSession):
     fumo_name = message.caption
-    fumo_file_id = message.photo[0].file_id
+    fumo_file_id = message.photo[-1].file_id
     fumo_link = None
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
@@ -93,6 +95,7 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
         fumos = await db_show_all_fumos(session)
     if not fumos:
         await message.answer("No fumos was found in db")
+        return None
     for fumo in fumos:
         try:
             await message.answer_photo(
@@ -244,3 +247,24 @@ async def edit_fumo_source_link_invalid_input(message: Message):
 async def update_fumo_cache(message: types.Message,  session: AsyncSession) -> None:
     await update_fumo_ids_cache(session)
     await message.reply("Cache updated")
+
+
+@router.message(Command("download_fumo_images"))
+async def download_fumo_images(message: types.Message,  session: AsyncSession, bot: Bot) -> None:
+    fumos = await db_show_all_fumos(session)
+    if not fumos:
+        await message.answer("No fumos was found in db")
+        return None
+    if not os.path.exists("media/photos"):
+        os.makedirs("media/photos")
+    await message.answer("Fumo images downloading started")
+    for fumo in fumos:
+        try:
+            file = await bot.get_file(fumo.file_id)
+            await bot.download_file(file.file_path, f"media/photos/{fumo.name}.jpg")
+            logging.info(f"media/photos/{fumo.name}.jpg downloaded")
+        except Exception as e:
+            await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
+            continue
+        await asyncio.sleep(1)
+    await message.answer("Fumo images downloading finished")
