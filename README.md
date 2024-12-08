@@ -80,5 +80,7 @@ docker compose -f docker-compose.yml up -d
  - `/add_fumo` FSM for adding fumos to db
  - `/cancel` exit from FSM
  - `/list_fumos` list all fumos in db.
- - `/list_fumos name` list fumos by name in db.
+ - `/list_fumos name` list fumos by name in db. List all if name not provided. 
  - `/update_fumo_cache` Fumos cache updating daily, you can manually update it with this command
+ - `/download_fumo_images name` Download fumo images from bot. For backup or transfer between bots. Download all if name not provided. 
+ - `/import_fumo_images name` Import fumo images. Bot will uppload images located in media/photos/ and add/update file_id to db. Import all if name not provided. Can be used for mass image update of transfer images between bots.
