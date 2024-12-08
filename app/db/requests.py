@@ -38,9 +38,14 @@ async def db_show_all_fumos(session: AsyncSession) -> list[Fumo]:
     return result.scalars().all()
 
 
-async def db_search_fumos_by_name(session: AsyncSession, search_pattern: str) -> Optional[Fumo]:
+async def db_search_fumos_by_name(session: AsyncSession, search_pattern: str) -> Optional[list[Fumo]]:
     result = await session.execute(select(Fumo).where(Fumo.name.like(f'%{search_pattern}%')))
     return result.scalars().all()
+
+
+async def db_get_fumo_by_name(session: AsyncSession, fumo_name: str) -> Optional[Fumo]:
+    result = await session.execute(select(Fumo).where(Fumo.name == fumo_name))
+    return result.scalar_one_or_none()
 
 
 async def db_delete_fumo_by_name(session: AsyncSession, fumo_name: str) -> str:

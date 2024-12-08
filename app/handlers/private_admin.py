@@ -1,5 +1,5 @@
 from aiogram import Router, F, types, Bot
-from aiogram.types import Message, input_media_photo
+from aiogram.types import Message, input_media_photo, FSInputFile
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
 from filters.text_is_link import TextIsLinkFilter
@@ -10,7 +10,7 @@ from aiogram.filters import Command, CommandObject
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.requests import db_add_fumo, update_fumo_ids_cache, db_show_all_fumos, db_search_fumos_by_name
 from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
-from db.requests import db_update_fumo_source_link_by_name
+from db.requests import db_update_fumo_source_link_by_name, db_get_fumo_by_name
 from aiogram.filters import and_f, invert_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from aiogram.enums import ParseMode
@@ -73,6 +73,7 @@ async def add_fumo(message: Message, session: AsyncSession):
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
     result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
+    await asyncio.sleep(1)
     await message.reply(result)
 
 
@@ -250,21 +251,71 @@ async def update_fumo_cache(message: types.Message,  session: AsyncSession) -> N
 
 
 @router.message(Command("download_fumo_images"))
-async def download_fumo_images(message: types.Message,  session: AsyncSession, bot: Bot) -> None:
-    fumos = await db_show_all_fumos(session)
+async def download_fumo_images(
+    message: types.Message,
+    command: CommandObject,
+    session: AsyncSession,
+    bot: Bot
+) -> None:
+    search_pattern = command.args
+    path = "media/photos"
+    if search_pattern:
+        fumos = await db_search_fumos_by_name(session, search_pattern)
+    else:
+        fumos = await db_show_all_fumos(session)
     if not fumos:
         await message.answer("No fumos was found in db")
         return None
-    if not os.path.exists("media/photos"):
-        os.makedirs("media/photos")
+    if not os.path.exists(path):
+        os.makedirs(path)
     await message.answer("Fumo images downloading started")
     for fumo in fumos:
         try:
+            if os.path.isfile(f"{path}/{fumo.name}.jpg"):
+                logging.info(f"{path}/{fumo.name}.jpg already exists")
+                continue
             file = await bot.get_file(fumo.file_id)
-            await bot.download_file(file.file_path, f"media/photos/{fumo.name}.jpg")
-            logging.info(f"media/photos/{fumo.name}.jpg downloaded")
+            await bot.download_file(file.file_path, f"{path}/{fumo.name}.jpg")
+            logging.info(f"{path}/{fumo.name}.jpg downloaded")
         except Exception as e:
             await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
             continue
         await asyncio.sleep(1)
-    await message.answer("Fumo images downloading finished")
+    await message.reply("Fumo images downloading finished")
+
+
+@router.message(Command("import_fumo_images"))
+async def import_fumo_images(message: types.Message, command: CommandObject, session: AsyncSession) -> None:
+    """
+    This command will upload images in media/photos/ and add/update their file_id in db for future use.
+    https://core.telegram.org/bots/api#sending-files
+    """
+    search_pattern = command.args
+    path = "media/photos"
+    fumos = []
+    if not os.path.exists(path):
+        await message.answer(f"{path} was not found")
+        return None
+    if search_pattern:
+        for file in os.listdir("media/photos/"):
+            if search_pattern in file:
+                fumos.append(file)
+    else:
+        fumos = os.listdir("media/photos/")
+    if len(fumos) == 0:
+        await message.answer(f"No fumos photos was found in {path}")
+        return None
+    for fumo in fumos:
+        try:
+            fumo_name = os.path.splitext(fumo)[0]
+            fumo_photo = await message.answer_photo(FSInputFile(f"{path}/{fumo}"))
+            fumo_name_exists_in_db = await db_get_fumo_by_name(session, fumo_name)
+            if fumo_name_exists_in_db:
+                result = await db_update_fumo_file_id_by_name(session, fumo_name, fumo_photo.photo[-1].file_id)
+            else:
+                result = await db_add_fumo(session, fumo_name, fumo_photo.photo[-1].file_id, source_link=None)
+            await message.reply(result)
+        except Exception as e:
+            await message.answer(f"Error occurred {str(e)}")
+        await asyncio.sleep(1)
+    await message.reply("Fumo images import finished")
