@@ -3,7 +3,6 @@ from pydantic import SecretStr, BaseModel, model_validator, Field
 from pydantic_settings import BaseSettings
 from pydantic_extra_types.timezone_name import TimeZoneName
 from typing import Optional
-from tzlocal import get_localzone
 
 with open('messages.yml', 'r') as stream1:
     messages_kwargs = yaml.safe_load(stream1)
@@ -34,7 +33,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
     HASH_SALT: Optional[SecretStr] = Field("salt", max_length=16)
-    TIMEZONE: Optional[TimeZoneName] = None
+    TIMEZONE: TimeZoneName = "UTC"
 
     class Config:
         env_file = ".env"
@@ -58,12 +57,6 @@ class Settings(BaseSettings):
                     ))
             else:
                 self.DATABASE_URI = SecretStr("sqlite+aiosqlite:///db.sqlite")
-            return self
-
-    @model_validator(mode="after")
-    def set_local_timezone_if_not_provided(self) -> "Settings":
-        if self.TIMEZONE is None:
-            self.TIMEZONE = get_localzone()
         return self
 
 
