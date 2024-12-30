@@ -1,0 +1,33 @@
+name: Run tests using tox
+
+on:
+  push:
+    branches:
+      - "dev"
+  pull_request:
+
+jobs:
+  tox:
+    name: Run tests using tox
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install tox
+        run: pip install tox
+
+      - name: Run tox
+        run: tox -vv
