@@ -19,8 +19,6 @@ services:
     restart: always
     networks:
       - backend
-    volumes:
-      - "/etc/localtime:/etc/localtime:ro"
     depends_on:
       - db
     environment:
