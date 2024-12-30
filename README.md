@@ -7,7 +7,7 @@ Silly telegram bot. Will welcome new users in the group and notify if someone ha
 
 
 ## Used technologies
-* Python 3.11 with asyncio, data validation and typing
+* Python 3 with asyncio, data validation and typing
 * aiogram 3
 * sqlalchemy asyncio wth SQLite for development or Postgres for production
 * Docker and Docker Compose
