@@ -57,7 +57,7 @@ class Settings(BaseSettings):
                     ))
             else:
                 self.DATABASE_URI = SecretStr("sqlite+aiosqlite:///db.sqlite")
-            return self
+        return self
 
 
 Config = Settings()
