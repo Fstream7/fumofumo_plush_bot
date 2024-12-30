@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN apk update && apk add --no-cache \
+RUN apk add --update --no-cache \
     build-base \
     libpq-dev \
     python3-dev

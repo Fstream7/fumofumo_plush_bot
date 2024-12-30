@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from handlers import get_id, fumofumo, group_member_left, group_member_new, private_admin, private_users, start
-from handlers import group_member_banned
+from handlers import group_member_banned, privacy
 from utils.commands import set_commands_for_admins
 from utils.scheduler import setup_scheduler
 from config import Config
@@ -27,6 +27,7 @@ async def main() -> None:
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
     dp.startup.register(start_bot)
     dp.include_router(start.router)
+    dp.include_router(privacy.router)
     dp.include_router(get_id.router)
     dp.include_router(fumofumo.router)
     dp.include_router(private_admin.router)

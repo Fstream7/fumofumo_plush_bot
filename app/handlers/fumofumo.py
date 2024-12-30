@@ -6,6 +6,7 @@ from db.requests import db_get_fumo_by_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from aiogram.enums import ParseMode
 import hashlib
+from pytz import timezone
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
@@ -18,7 +19,8 @@ async def fumo(message: types.Message) -> None:
 
 @router.message(Command("fumofumo"))
 async def fumofumo(message: types.Message, session: AsyncSession) -> None:
-    fumo_string = f"{message.from_user.id}_{message.date.strftime('%Y%m%d')}"
+    converted_date = message.date.astimezone(timezone(Config.TIMEZONE))
+    fumo_string = f"{message.from_user.id}_{converted_date.strftime('%Y%m%d')}"
     fumo_hash = hashlib.blake2b(fumo_string.encode(),
                                 digest_size=8,
                                 salt=str.encode(Config.HASH_SALT.get_secret_value())
