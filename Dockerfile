@@ -4,12 +4,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-RUN apk add --update --no-cache \
-    build-base \
-    libpq-dev \
-    python3-dev
-
-RUN pip3 install -r requirements.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY app/ .
 
