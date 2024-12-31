@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command, CommandObject
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.requests import db_add_fumo, update_fumo_ids_cache, db_show_all_fumos, db_search_fumos_by_name
+from db.requests import db_add_fumo, FumoCache, db_show_all_fumos, db_search_fumos_by_name
 from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
 from db.requests import db_update_fumo_source_link_by_name, db_get_fumo_by_name
 from aiogram.filters import and_f, invert_f
@@ -130,7 +130,7 @@ async def delete_fumo_from_db_confirm(callback: types.CallbackQuery, state: FSMC
     user_data = await state.get_data()
     result = await db_delete_fumo_by_name(session, user_data['fumo_to_delete'])
     message_to_delete = user_data['message_to_delete']
-    await update_fumo_ids_cache(session)
+    await FumoCache.update_fumo_ids_cache(session)
     await callback.message.answer(result)
     await callback.message.delete()
     await message_to_delete.delete()
@@ -246,7 +246,7 @@ async def edit_fumo_source_link_invalid_input(message: Message):
 
 @router.message(Command("update_fumo_cache"))
 async def update_fumo_cache(message: types.Message,  session: AsyncSession) -> None:
-    await update_fumo_ids_cache(session)
+    await FumoCache.update_fumo_ids_cache(session)
     await message.reply("Cache updated")
 
 
