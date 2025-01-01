@@ -3,7 +3,7 @@ import asyncio
 import logging
 from handlers import get_id, fumofumo, group_member_left, group_member_new, group_member_banned
 from handlers import privacy, start, private_admin, private_users
-from utils.commands import set_commands_for_admins
+from utils.commands import set_commands
 from utils.scheduler import setup_scheduler
 from config import Config
 from middlewares import DbSessionMiddleware
@@ -12,7 +12,7 @@ from aiogram import Bot, Dispatcher
 
 
 async def start_bot(bot: Bot):
-    await set_commands_for_admins(bot)
+    await set_commands(bot)
 
 
 async def main() -> None:
