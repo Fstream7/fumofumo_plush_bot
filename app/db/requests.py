@@ -1,10 +1,25 @@
+from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
-from .models import Fumo
 from sqlalchemy import select, delete, update
-from typing import Optional
+from .models import Fumo
 
-_fumo_ids_cache = None
+
+class FumoCache:
+    """Keep fumo db ids in cache. So if db updated - user still can get same fumo."""
+    _fumo_ids_cache: Optional[list[int]] = None
+
+    @classmethod
+    async def update_fumo_ids_cache(cls, session: AsyncSession) -> None:
+        result = await session.execute(select(Fumo.id).order_by(Fumo.id))
+        cls._fumo_ids_cache = [row[0] for row in result.all()]
+        await session.close()
+
+    @classmethod
+    async def get_fumo_ids_cache(cls, session: AsyncSession) -> list[int]:
+        if cls._fumo_ids_cache is None:
+            await cls.update_fumo_ids_cache(session)
+        return cls._fumo_ids_cache
 
 
 async def db_add_fumo(session: AsyncSession, name: str, file_id: str, source_link: Optional[str]) -> str:
@@ -18,17 +33,9 @@ async def db_add_fumo(session: AsyncSession, name: str, file_id: str, source_lin
         return f"Error occurred: {str(e)}"
 
 
-async def update_fumo_ids_cache(session: AsyncSession) -> None:
-    global _fumo_ids_cache
-    result = await session.execute(select(Fumo.id).order_by(Fumo.id))
-    _fumo_ids_cache = [row[0] for row in result.all()]
-    await session.close()
-
-
-async def db_get_fumo_by_id(session: AsyncSession, id: int) -> Fumo:
-    if _fumo_ids_cache is None:
-        await update_fumo_ids_cache(session)
-    fumo_list_id = _fumo_ids_cache[id % len(_fumo_ids_cache)]
+async def db_get_fumo_by_id(session: AsyncSession, fumo_id: int) -> Fumo:
+    fumo_ids_cache = await FumoCache.get_fumo_ids_cache(session)
+    fumo_list_id = fumo_ids_cache[fumo_id % len(fumo_ids_cache)]
     result = await session.execute(select(Fumo).where(Fumo.id == fumo_list_id))
     return result.scalar_one_or_none()
 

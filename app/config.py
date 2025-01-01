@@ -1,14 +1,16 @@
+from typing import Optional
+from dataclasses import dataclass
 import yaml
 from pydantic import SecretStr, BaseModel, model_validator, Field
 from pydantic_settings import BaseSettings
 from pydantic_extra_types.timezone_name import TimeZoneName
-from typing import Optional
 
-with open('messages.yml', 'r') as stream1:
+
+with open("messages.yml", "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
 
 
-class messages(BaseModel):
+class Messages(BaseModel):
     welcome_message: str = None
     thanks_message: str = None
     thanks_sticker: list[str] = []
@@ -35,6 +37,7 @@ class Settings(BaseSettings):
     HASH_SALT: Optional[SecretStr] = Field("salt", max_length=16)
     TIMEZONE: TimeZoneName = "UTC"
 
+    @dataclass
     class Config:
         env_file = ".env"
 
@@ -48,17 +51,13 @@ class Settings(BaseSettings):
                 and self.POSTGRES_PASSWORD is not None
             ):
                 self.DATABASE_URI = SecretStr(
-                    "postgresql+asyncpg://{username}:{password}@{host}:{port}/{database}".format(
-                        username=self.POSTGRES_USER,
-                        password=self.POSTGRES_PASSWORD.get_secret_value(),
-                        host=self.POSTGRES_HOST,
-                        port=self.POSTGRES_PORT,
-                        database=self.POSTGRES_DB,
-                    ))
+                    f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD.get_secret_value()}@"
+                    f"{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+                )
             else:
                 self.DATABASE_URI = SecretStr("sqlite+aiosqlite:///db.sqlite")
         return self
 
 
 Config = Settings()
-Messages = messages(**messages_kwargs)
+Messages = Messages(**messages_kwargs)

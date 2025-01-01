@@ -1,18 +1,18 @@
 #!/usr/bin/env python
-from handlers import get_id, fumofumo, group_member_left, group_member_new, private_admin, private_users, start
-from handlers import group_member_banned, privacy
-from utils.commands import set_commands_for_admins
+import asyncio
+import logging
+from handlers import get_id, fumofumo, group_member_left, group_member_new, group_member_banned
+from handlers import privacy, start, private_admin, private_users
+from utils.commands import set_commands
 from utils.scheduler import setup_scheduler
 from config import Config
-import asyncio
 from middlewares import DbSessionMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-import logging
 from aiogram import Bot, Dispatcher
 
 
 async def start_bot(bot: Bot):
-    await set_commands_for_admins(bot)
+    await set_commands(bot)
 
 
 async def main() -> None:
