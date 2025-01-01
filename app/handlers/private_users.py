@@ -35,11 +35,12 @@ async def media_group(messages: List[types.Message], bot: Bot) -> None:
             f"({messages[-1].from_user.id})"
         )
     )
+    unsorted_message_ids = [message.message_id for message in messages]
     await bot(
         ForwardMessages(
             chat_id=Config.ADMIN_CHAT_ID,
             from_chat_id=messages[-1].chat.id,
-            message_ids=[message.message_id for message in messages]
+            message_ids=sorted(unsorted_message_ids)
         )
     )
     await messages[-1].answer(Messages.thanks_message.format(user_full_name=messages[-1].from_user.full_name))
