@@ -1,24 +1,24 @@
+import hashlib
+from random import choice
 from aiogram.filters import Command
 from aiogram import Router, types
+from aiogram.enums import ParseMode
+from pytz import timezone
 from config import Messages, Config
-from random import choice
 from db.requests import db_get_fumo_by_id
 from sqlalchemy.ext.asyncio import AsyncSession
-from aiogram.enums import ParseMode
-import hashlib
-from pytz import timezone
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
 
 
 @router.message(Command("fumo"))
-async def fumo(message: types.Message) -> None:
+async def cmd_fumo(message: types.Message) -> None:
     await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ'])}")
 
 
 @router.message(Command("fumofumo"))
-async def fumofumo(message: types.Message, session: AsyncSession) -> None:
+async def cmd_fumofumo(message: types.Message, session: AsyncSession) -> None:
     converted_date = message.date.astimezone(timezone(Config.TIMEZONE))
     fumo_string = f"{message.from_user.id}_{converted_date.strftime('%Y%m%d')}"
     fumo_hash = hashlib.blake2b(fumo_string.encode(),

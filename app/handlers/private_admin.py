@@ -1,23 +1,23 @@
-from aiogram import Router, F, types, Bot
-from aiogram.types import Message, input_media_photo, FSInputFile
+import asyncio
+import os
+import logging
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
 from filters.text_is_link import TextIsLinkFilter
 from filters.text_is_command import TextIsCommandFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from aiogram.filters import Command, CommandObject
+from aiogram.filters import Command, CommandObject, and_f, invert_f
+from aiogram.enums import ParseMode
+from aiogram import Router, F, types, Bot
+from aiogram.types import Message, input_media_photo, FSInputFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.requests import db_add_fumo, FumoCache, db_show_all_fumos, db_search_fumos_by_name
 from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
 from db.requests import db_update_fumo_source_link_by_name, db_get_fumo_by_name
-from aiogram.filters import and_f, invert_f
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
-from aiogram.enums import ParseMode
 from utils.escape_for_markdown import escape_markdown
-import asyncio
-import os
-import logging
+
 
 router = Router()
 router.message.filter(AdminFilter())
@@ -73,8 +73,15 @@ async def add_fumo(message: Message, session: AsyncSession):
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
     result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
-    await asyncio.sleep(1)
     await message.reply(result)
+    fumo = await db_get_fumo_by_name(session, fumo_name)
+    await message.answer_photo(
+        photo=fumo.file_id,
+        caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
+        reply_markup=edit_buttons(),
+        parse_mode=ParseMode.MARKDOWN_V2
+    )
+    await asyncio.sleep(1)
 
 
 @router.message(Form.add_fumo, invert_f(TextIsCommandFilter()))

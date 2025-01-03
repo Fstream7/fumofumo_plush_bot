@@ -5,7 +5,7 @@ router = Router()
 
 
 @router.message(Command("privacy"))
-async def privacy(message: types.Message) -> None:
+async def cmd_privacy(message: types.Message) -> None:
     privacy = """Privacy Policy
 By sending messages to this bot in private chat, you agree to the following privacy policy
 It can be viewed at any time by using the `/privacy` command in private chat with the bot.

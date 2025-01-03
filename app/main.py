@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 import asyncio
 import logging
-from handlers import get_id, fumofumo, group_member_left, group_member_new, group_member_banned
-from handlers import privacy, start, private_admin, private_users
+from handlers import collect_routers
 from utils.commands import set_commands
 from utils.scheduler import setup_scheduler
 from config import Config
@@ -26,15 +25,7 @@ async def main() -> None:
     dp = Dispatcher()
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
     dp.startup.register(start_bot)
-    dp.include_router(start.router)
-    dp.include_router(privacy.router)
-    dp.include_router(get_id.router)
-    dp.include_router(fumofumo.router)
-    dp.include_router(private_admin.router)
-    dp.include_router(private_users.router)
-    dp.include_router(group_member_new.router)
-    dp.include_router(group_member_left.router)
-    dp.include_router(group_member_banned.router)
+    dp.include_routers(*collect_routers())
     setup_scheduler(sessionmaker())
     try:
         await dp.start_polling(bot)

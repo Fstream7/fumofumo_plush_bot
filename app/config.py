@@ -1,12 +1,12 @@
 from typing import Optional
-from dataclasses import dataclass
+from os import path
 import yaml
 from pydantic import SecretStr, BaseModel, model_validator, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
-
-with open("messages.yml", "r", encoding="utf-8") as stream1:
+file_path = path.join(path.dirname(__file__), 'messages.yml')
+with open(file_path, "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
 
 
@@ -34,12 +34,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
-    HASH_SALT: Optional[SecretStr] = Field("salt", max_length=16)
+    HASH_SALT: Optional[SecretStr] = SecretStr(Field("salt", max_length=16))
     TIMEZONE: TimeZoneName = "UTC"
-
-    @dataclass
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file='.env')
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":
