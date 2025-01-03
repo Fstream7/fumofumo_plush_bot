@@ -4,9 +4,10 @@ import yaml
 from pydantic import SecretStr, BaseModel, model_validator, Field
 from pydantic_settings import BaseSettings
 from pydantic_extra_types.timezone_name import TimeZoneName
+from os import path
 
-
-with open("messages.yml", "r", encoding="utf-8") as stream1:
+file_path = path.join(path.dirname(__file__), 'messages.yml')
+with open(file_path, "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
 
 
