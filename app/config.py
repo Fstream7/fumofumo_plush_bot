@@ -1,8 +1,7 @@
 from typing import Optional
-from dataclasses import dataclass
 import yaml
 from pydantic import SecretStr, BaseModel, model_validator, Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 from os import path
 
@@ -37,10 +36,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: Optional[SecretStr] = None
     HASH_SALT: Optional[SecretStr] = Field("salt", max_length=16)
     TIMEZONE: TimeZoneName = "UTC"
-
-    @dataclass
-    class Config:
-        env_file = ".env"
+    model_config = SettingsConfigDict(env_file='.env')
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":
