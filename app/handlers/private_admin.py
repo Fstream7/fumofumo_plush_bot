@@ -73,8 +73,15 @@ async def add_fumo(message: Message, session: AsyncSession):
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
     result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
-    await asyncio.sleep(1)
     await message.reply(result)
+    fumo = await db_get_fumo_by_name(session, fumo_name)
+    await message.answer_photo(
+                photo=fumo.file_id,
+                caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
+                reply_markup=edit_buttons(),
+                parse_mode=ParseMode.MARKDOWN_V2
+            )
+    await asyncio.sleep(1)
 
 
 @router.message(Form.add_fumo, invert_f(TextIsCommandFilter()))
