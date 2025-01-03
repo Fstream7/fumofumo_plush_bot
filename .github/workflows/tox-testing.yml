@@ -29,5 +29,8 @@ jobs:
       - name: Install tox
         run: pip install tox
 
-      - name: Run tox
-        run: tox -vv
+      - name: Run tox linting
+        run: tox -e flake8 -vv
+
+      - name: Run tox testing
+        run: tox -e py3 -vv
