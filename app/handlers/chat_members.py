@@ -1,8 +1,9 @@
+from random import choice
 from aiogram import Router
 from aiogram.types import ChatMemberUpdated
-from config import Messages
 from aiogram.filters.chat_member_updated import ChatMemberUpdatedFilter, IS_MEMBER, KICKED, LEFT, JOIN_TRANSITION
-from random import choice
+from config import Messages
+
 
 router = Router()
 

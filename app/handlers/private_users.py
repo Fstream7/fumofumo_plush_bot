@@ -1,13 +1,13 @@
+from typing import List
+from random import choice
 from aiogram import Router, F, types, Bot
 from aiogram.methods import ForwardMessages
-from config import Config
+from aiogram.filters import Command, invert_f
+from config import Config, Messages
 from filters.chat_type import ChatTypeFilter
 from filters.admin import AdminFilter
-from aiogram.filters import Command, invert_f
-from typing import List
 from decorators.media_group_handler import media_group_handler
-from config import Messages
-from random import choice
+
 
 router = Router()
 router.message.filter(ChatTypeFilter(chat_type=["private"]), invert_f(AdminFilter()))
