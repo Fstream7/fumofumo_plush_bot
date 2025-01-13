@@ -17,6 +17,8 @@ services:
   telegram_bot:
     image:  ghcr.io/fstream7/fumofumo_plush_bot:main
     restart: always
+    volumes:
+      - media:/app/media:rw
     networks:
       - backend
     depends_on:
@@ -31,3 +33,6 @@ services:
 
 networks:
   backend:
+
+volumes:
+    media:
