@@ -19,6 +19,7 @@ async def main() -> None:
         logging.info("Using postgres DB")
     elif "sqlite+aiosqlite:///" in Config.DATABASE_URI.get_secret_value():
         logging.info("Using sqlite DB")
+    logging.info(f"Using timezone {Config.TIMEZONE}")
     engine = create_async_engine(url=Config.DATABASE_URI.get_secret_value(), echo=True)
     sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     bot = Bot(token=Config.TELEGRAM_BOT_TOKEN.get_secret_value())
