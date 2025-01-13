@@ -6,7 +6,7 @@ PyYAML==6.0.2
 Alembic==1.14.0
 asyncpg==0.30.0
 aiosqlite==0.20.0
-sqlalchemy[asyncio]==2.0.36
+sqlalchemy[asyncio]==2.0.37
 apscheduler==3.11.0
 tzdata==2024.2
 pytz==2024.2
