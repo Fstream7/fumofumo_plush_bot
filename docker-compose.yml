@@ -19,6 +19,7 @@ services:
     restart: always
     volumes:
       - media:/app/media:rw
+      - "/etc/localtime:/etc/localtime:ro"
     networks:
       - backend
     depends_on:
