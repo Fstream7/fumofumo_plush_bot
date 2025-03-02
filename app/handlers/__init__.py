@@ -2,7 +2,7 @@ from aiogram import Router
 from . import get_id
 from . import fumofumo
 from . import group_members
-from . import group_block_nft
+# from . import group_block_nft
 from . import privacy
 from . import start
 from . import private_admin
