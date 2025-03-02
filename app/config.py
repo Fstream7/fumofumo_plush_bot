@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
-    HASH_SALT: Optional[SecretStr] = SecretStr(Field("salt", max_length=16))
+    HASH_SALT: Optional[SecretStr] = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
     model_config = SettingsConfigDict(env_file='.env')
 
