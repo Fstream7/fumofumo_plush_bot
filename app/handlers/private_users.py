@@ -56,7 +56,7 @@ async def process_propose(message: types.Message, bot: Bot) -> None:
     await message.answer_sticker(sticker=choice(Messages.propose_thanks_stickers))
 
 
-@router.edited_message()
-async def edited_propose_message(edited_message: types.Message) -> None:
-    await edited_message.answer(
-        Messages.propose_cant_edit_message.format(user_full_name=edited_message.from_user.full_name))
+# @router.edited_message()
+# async def edited_propose_message(edited_message: types.Message) -> None:
+#     await edited_message.answer(
+#         Messages.propose_cant_edit_message.format(user_full_name=edited_message.from_user.full_name))
