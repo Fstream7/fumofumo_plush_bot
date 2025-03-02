@@ -5,7 +5,7 @@ from aiogram import Router, types
 from aiogram.enums import ParseMode
 from pytz import timezone
 from config import Messages, Config
-from db.requests import db_get_fumo_by_id, FumoCache
+from db.requests import db_get_fumo_by_id
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.escape_for_markdown import escape_markdown
 
