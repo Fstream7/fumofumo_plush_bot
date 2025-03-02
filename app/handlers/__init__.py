@@ -18,5 +18,5 @@ def collect_routers() -> list[Router]:
         private_admin.router,
         private_users.router,
         group_members.router,
-        group_block_nft.router,
+        # group_block_nft.router,
     ]
