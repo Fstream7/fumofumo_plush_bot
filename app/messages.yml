@@ -1,4 +1,5 @@
 ---
+welcome_message: "Hello {user_full_name}! \nSend me a post you want, I will pass it to admins"
 propose_command_message: |
   Send me fumo images and I will forward them for admins to post on channel.
   If you do not want your account to be viewed on forwarding to channel, then 
