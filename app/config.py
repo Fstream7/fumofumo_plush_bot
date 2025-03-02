@@ -11,6 +11,7 @@ with open(file_path, "r", encoding="utf-8") as stream1:
 
 
 class Messages(BaseModel):
+    welcome_message: str
     propose_command_message: str
     propose_cant_edit_message: str
     propose_thanks_message: str
