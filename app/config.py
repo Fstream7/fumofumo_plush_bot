@@ -25,6 +25,7 @@ class Messages(BaseModel):
     fumofumo_message: str
     fumofumo_message_not_found: str
     privacy: str
+    nft_ban_message: str
 
 
 class Settings(BaseSettings):

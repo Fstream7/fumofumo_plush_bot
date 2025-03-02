@@ -66,3 +66,5 @@ privacy: |
 
   Contact
   If you have any questions or concerns about this privacy policy, please contact the bot owner directly.
+
+nft_ban_message: "Deleted message from {user_full_name} containing NFT link"
