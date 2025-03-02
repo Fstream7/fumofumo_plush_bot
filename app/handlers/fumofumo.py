@@ -5,7 +5,7 @@ from aiogram import Router, types
 from aiogram.enums import ParseMode
 from pytz import timezone
 from config import Messages, Config
-from db.requests import db_get_fumo_by_id
+from db.requests import db_get_fumo_by_id, FumoCache
 from sqlalchemy.ext.asyncio import AsyncSession
 from utils.escape_for_markdown import escape_markdown
 
@@ -27,7 +27,10 @@ async def cmd_fumofumo(message: types.Message, session: AsyncSession) -> None:
                                 ).hexdigest()
     fumo_id = int(fumo_hash, 16)
     fumo = await db_get_fumo_by_id(session, fumo_id)
-    await message.reply_photo(
-        photo=fumo.file_id,
-        caption=Messages.fumofumo_message.format(fumo=f"[{escape_markdown(fumo.name)}]({fumo.source_link})"),
-        parse_mode=ParseMode.MARKDOWN_V2)
+    if fumo:
+        await message.reply_photo(
+            photo=fumo.file_id,
+            caption=Messages.fumofumo_message.format(fumo=f"[{escape_markdown(fumo.name)}]({fumo.source_link})"),
+            parse_mode=ParseMode.MARKDOWN_V2)
+    else:
+        await message.reply("Sorry, your fumo was not found in database")
