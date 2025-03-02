@@ -11,6 +11,7 @@ from decorators.media_group_handler import media_group_handler
 
 router = Router()
 router.message.filter(ChatTypeFilter(chat_type=["private"]), invert_f(AdminFilter()))
+router.edited_message.filter(ChatTypeFilter(chat_type=["private"]), invert_f(AdminFilter()))
 
 
 @router.message(Command("propose"))
@@ -56,7 +57,7 @@ async def process_propose(message: types.Message, bot: Bot) -> None:
     await message.answer_sticker(sticker=choice(Messages.propose_thanks_stickers))
 
 
-# @router.edited_message()
-# async def edited_propose_message(edited_message: types.Message) -> None:
-#     await edited_message.answer(
-#         Messages.propose_cant_edit_message.format(user_full_name=edited_message.from_user.full_name))
+@router.edited_message()
+async def edited_propose_message(edited_message: types.Message) -> None:
+    await edited_message.answer(
+        Messages.propose_cant_edit_message.format(user_full_name=edited_message.from_user.full_name))
