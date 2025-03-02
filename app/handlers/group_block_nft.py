@@ -23,7 +23,7 @@ async def block_nft_spam(message: types.Message) -> None:
         text = message.text
     elif message.caption:
         text = message.caption
-    if not text:
+    else:
         return None
     if sites := re.findall(r"https?://(?:www\.)?[\w\-]+\.io(?:/[\w\-./?%&=]*)?", text, re.IGNORECASE):
         headers = {
