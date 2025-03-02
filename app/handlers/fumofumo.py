@@ -33,4 +33,4 @@ async def cmd_fumofumo(message: types.Message, session: AsyncSession) -> None:
             caption=Messages.fumofumo_message.format(fumo=f"[{escape_markdown(fumo.name)}]({fumo.source_link})"),
             parse_mode=ParseMode.MARKDOWN_V2)
     else:
-        await message.reply("Sorry, your fumo was not found in database")
+        await message.reply(Messages.fumofumo_message_not_found)

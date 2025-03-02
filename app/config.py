@@ -21,7 +21,7 @@ class Messages(BaseModel):
     ban_member_message: str = None
     ban_member_sticker: list[str] = []
     fumofumo_message: str = None
-    fumofumo_fumos: list[object] = []
+    fumofumo_message_not_found: str = None
 
 
 class Settings(BaseSettings):
