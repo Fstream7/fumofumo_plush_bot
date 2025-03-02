@@ -1,7 +1,7 @@
 from typing import Optional
 from os import path
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator, Field
+from pydantic import SecretStr, BaseModel, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
@@ -11,17 +11,21 @@ with open(file_path, "r", encoding="utf-8") as stream1:
 
 
 class Messages(BaseModel):
-    welcome_message: str = None
-    thanks_message: str = None
-    thanks_sticker: list[str] = []
-    new_member_message: str = None
-    new_member_sticker: list[str] = []
-    left_member_message: str = None
-    left_member_sticker: list[str] = []
-    ban_member_message: str = None
-    ban_member_sticker: list[str] = []
-    fumofumo_message: str = None
-    fumofumo_fumos: list[object] = []
+    welcome_message: str
+    propose_command_message: str
+    propose_cant_edit_message: str
+    propose_thanks_message: str
+    propose_thanks_stickers: list[str]
+    new_member_message: str
+    new_member_stickers: list[str]
+    left_member_message: str
+    left_member_stickers: list[str]
+    ban_member_message: str
+    ban_member_stickers: list[str]
+    fumofumo_message: str
+    fumofumo_message_not_found: str
+    privacy: str
+    nft_ban_message: str
 
 
 class Settings(BaseSettings):
@@ -34,7 +38,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
-    HASH_SALT: Optional[SecretStr] = SecretStr(Field("salt", max_length=16))
+    HASH_SALT: Optional[SecretStr] = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
     model_config = SettingsConfigDict(env_file='.env')
 

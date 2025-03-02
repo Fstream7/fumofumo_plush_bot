@@ -1,12 +1,13 @@
 aiogram==3.17.0
 asyncio==3.4.3
 pydantic-settings==2.7.1
-pydantic-extra-types==2.10.1
+pydantic-extra-types==2.10.2
 PyYAML==6.0.2
-Alembic==1.14.0
+Alembic==1.14.1
 asyncpg==0.30.0
-aiosqlite==0.20.0
+aiosqlite==0.21.0
 sqlalchemy[asyncio]==2.0.36
 apscheduler==3.11.0
-tzdata==2024.2
+tzdata==2025.1
 pytz==2024.2
+curl_cffi==0.9.0

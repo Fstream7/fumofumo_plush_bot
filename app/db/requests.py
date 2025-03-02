@@ -35,6 +35,8 @@ async def db_add_fumo(session: AsyncSession, name: str, file_id: str, source_lin
 
 async def db_get_fumo_by_id(session: AsyncSession, fumo_id: int) -> Fumo:
     fumo_ids_cache = await FumoCache.get_fumo_ids_cache(session)
+    if len(fumo_ids_cache) == 0:
+        return None
     fumo_list_id = fumo_ids_cache[fumo_id % len(fumo_ids_cache)]
     result = await session.execute(select(Fumo).where(Fumo.id == fumo_list_id))
     return result.scalar_one_or_none()
