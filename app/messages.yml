@@ -1,7 +1,13 @@
 ---
-welcome_message: "Hello {user_full_name}! \nSend me a post you want, I will pass it to admins"
-thanks_message: "Thanks, message sent to admins, you are greatly appreciated!"
-thanks_sticker:
+propose_command_message: |
+  Send me fumo images and I will forward them for admins to post on channel.
+  If you do not want your account to be viewed on forwarding to channel, then 
+  disable link for forwarding in Telegram privacy settings or write in 
+  the message that you want to remain anonymous.
+  `/propose` command is deprecated and dont need anymore, just send fumo images to bot
+propose_cant_edit_message: "Sorry, editing messages not supported yet, if you want to change anything - please send post again with changes"
+propose_thanks_message: "Thanks, message sent to admins, you are greatly appreciated!"
+propose_thanks_stickers:
   - CAACAgIAAxkBAAOiZRDnD4XJdYuBXTzf_Ot9KH25iyEAApASAAIaWglJ8pDuOlI6QjUwBA
   - CAACAgUAAxkBAAPWZRDy6v1yVvzJooV2GNk-pY-wavQAAwcAAtoWIVcEnn_e8QQJzTAE
   - CAACAgIAAxkBAAPYZRDzfXzT2uEuRFaT60-qWx0WxwQAAt0UAAL3k-BLzzHccROJDFIwBA
@@ -15,7 +21,7 @@ thanks_sticker:
   - CAACAgIAAxkBAAIDb2XOeiIMlEsi03HfTMwYSUWuaB85AALmDgACx6KISEInV04AAR-87zQE
 
 new_member_message: "Hello, {user_full_name}, read the rules in group description"
-new_member_sticker:
+new_member_stickers:
   - CAACAgIAAxkBAAIBNWURDvuxhT0vyCU3lQ8mgcXq9HvOAAJGDAACaxlYSnsuqbefOaqFMAQ
   - CAACAgUAAxkBAAIBN2URDwusbf2WYg4VUYGP9ndtF2I8AALsCAAC8bOxVsrcu--rZPA1MAQ
   - CAACAgIAAxkBAAIBOWURDyUNxMLr3njRheRt6mYO3fxxAAKlFwACH-fZS06o7pjr9LwHMAQ
@@ -29,7 +35,7 @@ new_member_sticker:
   - CAACAgUAAxkBAAIDc2XOektC_c09nnZZzPARQ5jZeCMxAAJlBQACzoz5VGNrKUvXmyZHNAQ
 
 left_member_message: "Fumo fren no more, goodbye {user_full_name}"
-left_member_sticker:
+left_member_stickers:
   - CAACAgIAAxkBAAIBP2URD2su4idILHCpEVniQJ2ItvF4AAIrDwACxx24SqWKrif9QzgWMAQ
   - CAACAgIAAxkBAAIBQWURD5F2lvBOtQZ-kb_hYJUkeBi0AAK6JgACa9BYShGQ3ksaTfYvMAQ
   - CAACAgIAAxkBAAIDXWXOeR3i-LTiWuYQ1eJ6vB8V6p3CAAI7HwACwhDASBSs1quEBVdMNAQ
@@ -37,9 +43,25 @@ left_member_sticker:
   - CAACAgIAAxkBAAIDbWXOefr1iLHJK25__zwlVZupWOW-AAKYDQACUTlIS8RcRn6BL0VrNAQ
 
 ban_member_message: "{user_full_name} got fumoed."
-ban_member_sticker:
+ban_member_stickers:
   - CAACAgIAAxkBAAIGWma86Aubon2IHELhjXUmPlDP7ldtAAIVEwACwW84SwW2vm1C5webNQQ
   - CAACAgEAAxkBAAIGXGa86B8meDkAAToWyanIbh55w94lwwACAwADUypEPCIiz7NiEMoaNQQ
 
 fumofumo_message: "Your fumo of the day is {fumo}"
 fumofumo_message_not_found: "Sorry, your fumo was not found in database."
+
+privacy: |
+  Privacy Policy
+  By sending messages to this bot in private chat, you agree to the following privacy policy
+  It can be viewed at any time by using the `/privacy` command in private chat with the bot.
+
+  Data Collection
+  Fumobot don't collect or save any received data.
+  All received messages in direct chat wih bot are forwarding to bot administrator and can be posted publicly
+  This data is only stored on Telegram servers, bot don't store them. Bot also sends your name and login for feedback.
+  If you do not want your account to be viewed on forwarding to channel, disable link for forwarding in
+  Telegram privacy settings or write in the message that you want to remain anonymous.
+  For /fumofumo command fumobot will get your user_id in Telegram for processing.
+
+  Contact
+  If you have any questions or concerns about this privacy policy, please contact the bot owner directly.

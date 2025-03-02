@@ -15,13 +15,7 @@ router.message.filter(ChatTypeFilter(chat_type=["private"]), invert_f(AdminFilte
 
 @router.message(Command("propose"))
 async def propose(message: types.Message) -> None:
-    await message.reply(
-        "Send me fumo images and I will forward them for admins to post on channel.\n"
-        "If you do not want your account to be viewed on forwarding to channel, then "
-        "disable link for forwarding in Telegram privacy settings or write in "
-        "the message that you want to remain anonymous.\n"
-        "`/propose` command is deprecated and dont need anymore, just send fumo images to bot"
-    )
+    await message.reply(Messages.propose_command_message)
 
 
 @router.message(F.media_group_id, F.content_type.in_({'photo', 'video', 'audio', 'document'}))
@@ -43,8 +37,8 @@ async def media_group(messages: List[types.Message], bot: Bot) -> None:
             message_ids=sorted(unsorted_message_ids)
         )
     )
-    await messages[-1].answer(Messages.thanks_message.format(user_full_name=messages[-1].from_user.full_name))
-    await messages[-1].answer_sticker(sticker=choice(Messages.thanks_sticker))
+    await messages[-1].answer(Messages.propose_thanks_message.format(user_full_name=messages[-1].from_user.full_name))
+    await messages[-1].answer_sticker(sticker=choice(Messages.propose_thanks_stickers))
 
 
 @router.message()
@@ -58,5 +52,11 @@ async def process_propose(message: types.Message, bot: Bot) -> None:
         )
     )
     await message.forward(Config.ADMIN_CHAT_ID)
-    await message.answer(Messages.thanks_message.format(user_full_name=message.from_user.full_name))
-    await message.answer_sticker(sticker=choice(Messages.thanks_sticker))
+    await message.answer(Messages.propose_thanks_message.format(user_full_name=message.from_user.full_name))
+    await message.answer_sticker(sticker=choice(Messages.propose_thanks_stickers))
+
+
+@router.edited_message()
+async def edited_propose_message(edited_message: types.Message) -> None:
+    await edited_message.answer(
+        Messages.propose_cant_edit_message.format(user_full_name=edited_message.from_user.full_name))
