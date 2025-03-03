@@ -59,6 +59,7 @@ privacy: |
   Data Collection
   Fumobot don't collect or save any received data.
   All received messages in direct chat wih bot are forwarding to bot administrator and can be posted publicly
+  Messages in groups are processed for the content of blacklisted words for antispam.
   This data is only stored on Telegram servers, bot don't store them. Bot also sends your name and login for feedback.
   If you do not want your account to be viewed on forwarding to channel, disable link for forwarding in
   Telegram privacy settings or write in the message that you want to remain anonymous.
@@ -67,4 +68,34 @@ privacy: |
   Contact
   If you have any questions or concerns about this privacy policy, please contact the bot owner directly.
 
-nft_ban_message: "Deleted message from {user_full_name} containing NFT link"
+blacklist_ban_message: "Deleted message from {user_full_name} containing word from blacklist"
+blacklist_words:
+  - opensea.io
+  - blur.io
+  - rarible.com
+  - superrare.com
+  - foundation.app
+  - niftygateway.com
+  - mintable.app
+  - knownorigin.io
+  - zora.co
+  - makersplace.com
+  - decentraland.org
+  - veve.me
+  - okx.com
+  - binance.com/nft
+  - nft.coinbase.com
+  - looksrare.org
+  - magiceden.io
+  - solanart.io
+  - hicetnunc.art
+  - objkt.com
+  - async.art
+  - portion.io
+  - blockparty.co
+  - enjin.io
+  - bakeryswap.org
+  - treasureland.market
+  - nftshowroom.com
+  - viv3.com
+  - cargo.build

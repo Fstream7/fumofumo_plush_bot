@@ -2,7 +2,7 @@ from aiogram import Router
 from . import get_id
 from . import fumofumo
 from . import group_members
-# from . import group_block_nft
+from . import group_delete_messages_with_blacklist
 from . import privacy
 from . import start
 from . import private_admin
@@ -18,5 +18,5 @@ def collect_routers() -> list[Router]:
         private_admin.router,
         private_users.router,
         group_members.router,
-        # group_block_nft.router,
+        group_delete_messages_with_blacklist.router,
     ]
