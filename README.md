@@ -1,5 +1,10 @@
 # fumofumo_plush_bot
-Silly telegram bot. Will welcome new users in the group and notify if someone has left. Users can propose posts to the channel with private messages.
+Silly telegram bot. 
+-  If anyone joins, leaves, or is banned from a group, the bot will notify about it with a text and a sticker.
+- Users can propose posts to the channel with private messages.
+- fumofumo database for fun. Each user can get his daily fumo based on his userid and current day. This data is hashed and salting to get the most random and untreckable, but repeatable result.
+- admin can add, edit and delete fumos from db using chat with bot. 
+- Delete messages in group with NFT sites or any other blacklisted words.
 
 [https://t.me/fumofumo_plush_bot](https://t.me/fumofumo_plush_bot)
 
@@ -85,3 +90,8 @@ docker compose -f docker-compose.yml up -d
  - `/update_fumo_cache` Fumos cache updating daily, you can manually update it with this command
  - `/download_fumo_images name` Download fumo images from bot. For backup or transfer between bots. Download all if name not provided. 
  - `/import_fumo_images name` Import fumo images. Bot will uppload images located in media/photos/ and add/update file_id to db. Import all if name not provided. Can be used for mass image update of transfer images between bots.
+
+
+### How to disable command/handler:
+1. Remove/comment handler in `app/handlers/__init__.py`
+2. Remove/comment command in `app/utils/commands.py`
