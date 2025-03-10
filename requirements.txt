@@ -3,7 +3,7 @@ asyncio==3.4.3
 pydantic-settings==2.7.1
 pydantic-extra-types==2.10.2
 PyYAML==6.0.2
-Alembic==1.14.1
+Alembic==1.15.1
 asyncpg==0.30.0
 aiosqlite==0.21.0
 sqlalchemy[asyncio]==2.0.36
