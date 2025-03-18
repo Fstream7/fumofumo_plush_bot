@@ -1,4 +1,4 @@
-aiogram==3.17.0
+aiogram==3.18.0
 asyncio==3.4.3
 pydantic-settings==2.7.1
 pydantic-extra-types==2.10.3
