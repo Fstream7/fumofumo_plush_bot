@@ -99,3 +99,11 @@ blacklist_words:
   - nftshowroom.com
   - viv3.com
   - cargo.build
+
+
+quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your collection."
+quiz_success_message: |
+ That's right, {fumo} has been added to your collection.
+ Use /my_fumos to see your fumos collection.
+quiz_fail_message: "Wrong."
+quiz_no_fumos_in_collection_message: "You dont have any fumos in your collection yet"

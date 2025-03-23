@@ -27,6 +27,10 @@ class Messages(BaseModel):
     privacy: str
     blacklist_words: list[str]
     blacklist_ban_message: str
+    quiz_guess_message:  str
+    quiz_success_message: str
+    quiz_fail_message: str
+    quiz_no_fumos_in_collection_message: str
 
 
 class Settings(BaseSettings):
