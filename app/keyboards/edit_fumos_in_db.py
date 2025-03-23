@@ -2,8 +2,12 @@ from aiogram.types import InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
-def edit_buttons() -> InlineKeyboardMarkup:
+def edit_buttons(enable_for_quiz_status: bool = False) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder()
+    if enable_for_quiz_status:
+        enable_for_quiz_emoji = "✅"
+    else:
+        enable_for_quiz_emoji = "🚫"
     keyboard.button(
         text="edit name",
         callback_data="edit_fumo_name"
@@ -15,6 +19,10 @@ def edit_buttons() -> InlineKeyboardMarkup:
     keyboard.button(
         text="replace image",
         callback_data="edit_fumo_image"
+    )
+    keyboard.button(
+        text=(f"quiz {enable_for_quiz_emoji}"),
+        callback_data="toggle_fumo_for_quiz",
     )
     keyboard.button(
         text="delete",

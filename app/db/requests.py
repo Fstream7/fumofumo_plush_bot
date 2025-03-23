@@ -1,8 +1,9 @@
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import select, delete, update
-from .models import Fumo
+from sqlalchemy import select, delete, update, desc
+from sqlalchemy.sql.expression import func
+from .models import Fumo, QuizUsers
 
 
 class FumoCache:
@@ -101,3 +102,46 @@ async def db_update_fumo_source_link_by_name(session: AsyncSession, fumo_name: s
     except SQLAlchemyError as e:
         await session.rollback()
         return f"Error occurred: {str(e)}"
+
+
+async def db_update_fumo_quiz_by_name(session: AsyncSession, fumo_name: str, new_use_for_quiz: bool) -> str:
+    try:
+        await session.execute(update(Fumo).
+                              where(Fumo.name == fumo_name).
+                              values(use_for_quiz=new_use_for_quiz))
+        await session.commit()
+        return f"{fumo_name} quiz status updated."
+    except SQLAlchemyError as e:
+        await session.rollback()
+        return f"Error occurred: {str(e)}"
+
+
+async def db_get_random_fumo_for_quiz(session: AsyncSession) -> str:
+    result = await session.execute(select(Fumo).
+                                   where(Fumo.use_for_quiz).
+                                   order_by(func.random()).
+                                   limit(1))
+    return result.scalar_one_or_none()
+
+
+async def db_quiz_add_entry(session: AsyncSession, user_id: float, fumo_name: str) -> str:
+    result = await session.execute(select(QuizUsers).
+                                   where(QuizUsers.user_id == user_id, QuizUsers.fumo_name == fumo_name))
+    quiz_entry = result.scalar_one_or_none()
+    if quiz_entry:
+        quiz_entry.fumo_count += 1
+    else:
+        quiz_entry = QuizUsers(user_id=user_id, fumo_name=fumo_name, fumo_count=1)
+        session.add(quiz_entry)
+    try:
+        await session.commit()
+    except SQLAlchemyError as e:
+        await session.rollback()
+        return f"Error occurred: {str(e)}"
+
+
+async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float) -> str:
+    result = await session.execute(select(QuizUsers).
+                                   where(QuizUsers.user_id == user_id).
+                                   order_by(desc(QuizUsers.fumo_count)))
+    return result.scalars().all()
