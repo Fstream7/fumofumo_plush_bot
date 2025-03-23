@@ -23,9 +23,11 @@ def upgrade() -> None:
     op.create_table('quiz_users',
                     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
                     sa.Column('user_id', sa.Float(), nullable=True),
-                    sa.Column('fumo_name', sa.String(), nullable=False),
-                    sa.Column('fumo_count', sa.Integer(), nullable=False),
-                    sa.ForeignKeyConstraint(['fumo_name'], ['fumo.name'], ),
+                    sa.Column('user_name', sa.String(), nullable=True),
+                    sa.Column('fumo_id', sa.Integer(), nullable=True),
+                    sa.Column('fumo_count', sa.Integer(), nullable=True),
+                    sa.Column('group_id', sa.Float(), nullable=True),
+                    sa.ForeignKeyConstraint(['fumo_id'], ['fumo.id'], ),
                     sa.PrimaryKeyConstraint('id')
                     )
     # ### end Alembic commands ###
