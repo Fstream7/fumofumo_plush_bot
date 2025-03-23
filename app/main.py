@@ -8,6 +8,8 @@ from config import Config
 from middlewares import DbSessionMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from aiogram import Bot, Dispatcher
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.strategy import FSMStrategy
 
 
 async def start_bot(bot: Bot):
@@ -23,7 +25,7 @@ async def main() -> None:
     engine = create_async_engine(url=Config.DATABASE_URI.get_secret_value(), echo=True)
     sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     bot = Bot(token=Config.TELEGRAM_BOT_TOKEN.get_secret_value())
-    dp = Dispatcher()
+    dp = Dispatcher(storage=MemoryStorage(), fsm_strategy=FSMStrategy.CHAT)
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
     dp.startup.register(start_bot)
     dp.include_routers(*collect_routers())
