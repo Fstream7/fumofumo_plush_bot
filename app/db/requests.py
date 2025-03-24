@@ -132,10 +132,19 @@ async def db_quiz_add_entry(
         group_id: float
 ) -> str:
     """
-    If record with user_id, fumo_id and group_id exist - increase fumo_count for it.
-    If user name was changed - update it.
-    If record not exist - create new one.
+    Create user if not exist. Update name if changed
+    If user_id, fumo_id and group_id exist in QuizResults - increase fumo_count for it.
+    If QuizResults record not exist - create new one.
     """
+    quiz_user_result = await session.execute(select(QuizUsers)
+                                             .where(QuizUsers.user_id == user_id))
+    quiz_user = quiz_user_result.scalar_one_or_none()
+    if quiz_user:
+        if user_name != quiz_user.user_name:
+            quiz_user.user_name = user_name
+    else:
+        quiz_user = QuizUsers(user_id=user_id, user_name=user_name)
+        session.add(quiz_user)
     quiz_entry_result = await session.execute(select(QuizResults)
                                               .where(
         QuizResults.user_id == user_id,
@@ -145,14 +154,7 @@ async def db_quiz_add_entry(
     quiz_entry = quiz_entry_result.scalar_one_or_none()
     if quiz_entry:
         quiz_entry.fumo_count += 1
-        quiz_user_result = await session.execute(select(QuizUsers)
-                                                 .where(QuizUsers.user_id == user_id))
-        quiz_user = quiz_user_result.scalar_one_or_none()
-        if user_name != quiz_user.user_name:
-            quiz_user.user_name = user_name
     else:
-        quiz_user = QuizUsers(user_id=user_id, user_name=user_name)
-        session.add(quiz_user)
         quiz_entry = QuizResults(user_id=user_id, fumo_id=fumo_id, fumo_count=1, group_id=group_id)
         session.add(quiz_entry)
     try:
@@ -175,16 +177,16 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
     return result.all()
 
 
-async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> str:
+async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> list:
     result = await session.execute(
         select(
-            QuizResults.user_id,
+            QuizUsers.user_id,
             QuizUsers.user_name,
             func.sum(QuizResults.fumo_count).label("fumo_count")
         )
-        .join(QuizResults, QuizUsers.user_id == QuizResults.user_id)
+        .join(QuizUsers, QuizResults.user_id == QuizUsers.user_id)
         .where(QuizResults.group_id == group_id)
-        .group_by(QuizUsers.user_id, QuizUsers.user_name)
+        .group_by(QuizResults.user_id, QuizUsers.user_name)
         .order_by(desc("fumo_count"))
         .limit(10)
     )

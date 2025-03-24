@@ -79,5 +79,6 @@ async def cmd_my_fumos(message: types.Message, session: AsyncSession) -> None:
 @router.message(Command("leaderboard"))
 async def cmd_leaderboard(message: types.Message, session: AsyncSession) -> None:
     result = await db_quiz_get_leaderboard(session, group_id=message.chat.id)
-    fumo_names_text = "\n".join([f"{row.user_name} - {str(row.fumo_count)}" for row in result])
-    await message.reply(fumo_names_text)
+    if len(result) > 0:
+        fumo_names_text = "\n".join([f"{row.user_name} - {str(row.fumo_count)}" for row in result])
+        await message.reply(fumo_names_text)
