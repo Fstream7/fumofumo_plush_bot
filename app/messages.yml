@@ -57,13 +57,17 @@ privacy: |
   It can be viewed at any time by using the `/privacy` command in private chat with the bot.
 
   Data Collection
-  Fumobot don't collect or save any received data.
-  All received messages in direct chat wih bot are forwarding to bot administrator and can be posted publicly
-  Messages in groups are processed for the content of blacklisted words for antispam.
-  This data is only stored on Telegram servers, bot don't store them. Bot also sends your name and login for feedback.
-  If you do not want your account to be viewed on forwarding to channel, disable link for forwarding in
-  Telegram privacy settings or write in the message that you want to remain anonymous.
-  For /fumofumo command fumobot will get your user_id in Telegram for processing.
+  1. Propose:
+    All received messages (except commands) in direct chat with bot are forwarding to bot administrator and can be posted publicly
+    This data is only stored on Telegram servers, bot don't store it. Bot also sends your name and login for feedback to an administrator.
+    If you do not want your account to be viewed on forwarding to channel, disable link for forwarding in
+    Telegram privacy settings, or write in the message that you want to remain anonymous.
+  2. /fumofumo command: 
+    fumobot will get your user_id in Telegram for processing.
+  3. Groups:
+    Messages in groups are processed for the content of blacklisted words for antispam.
+    When participating in the quiz, your name and user_id will be saved in db for leaderboard. 
+    You can contact the bot administrator to delete this data.
 
   Contact
   If you have any questions or concerns about this privacy policy, please contact the bot owner directly.

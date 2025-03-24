@@ -16,7 +16,9 @@ class QuizUsers(Base):
     __tablename__ = "quiz_users"
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Float)
-    fumo_name = Column(String, ForeignKey("fumo.name"), nullable=False)
+    user_name = Column(String, nullable=True)
+    fumo_id = Column(Integer, ForeignKey("fumo.id"))
     fumo_count = Column(Integer, default=0)
+    group_id = Column(Float)
 
     fumo = relationship("Fumo", backref="quiz_entries")
