@@ -18,7 +18,7 @@ class Fumo(Base):
 class QuizUsers(Base):
     __tablename__ = "quiz_users"
 
-    user_id = Column(Float, primary_key=True)
+    user_id = Column(Integer, primary_key=True)
     user_name = Column(String, nullable=True)
 
     quiz_results = relationship("QuizResults", back_populates="quiz_user", cascade="all, delete")
@@ -28,10 +28,10 @@ class QuizResults(Base):
     __tablename__ = "quiz_results"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Float, ForeignKey("quiz_users.user_id", ondelete="CASCADE"))
+    user_id = Column(Integer, ForeignKey("quiz_users.user_id", ondelete="CASCADE"))
     fumo_id = Column(Integer, ForeignKey("fumo.id", ondelete="CASCADE"))
     fumo_count = Column(Integer, default=0)
-    group_id = Column(Float)
+    group_id = Column(Integer)
 
     fumo = relationship("Fumo", back_populates="quiz_results")
     quiz_user = relationship("QuizUsers", back_populates="quiz_results")
