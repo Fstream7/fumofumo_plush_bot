@@ -180,7 +180,7 @@ async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> str
             func.sum(QuizUsers.fumo_count).label("fumo_count")
         )
         .where(QuizUsers.group_id == group_id)
-        .group_by(QuizUsers.user_id)
+        .group_by(QuizUsers.user_id, QuizUsers.user_name)
         .order_by(desc("fumo_count"))
         .limit(10)
     )
