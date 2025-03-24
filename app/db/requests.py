@@ -174,10 +174,14 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
 
 async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> str:
     result = await session.execute(
-        select(QuizUsers)
+        select(
+            QuizUsers.user_id,
+            QuizUsers.user_name,
+            func.sum(QuizUsers.fumo_count).label("fumo_count")
+        )
         .where(QuizUsers.group_id == group_id)
-        .order_by(desc(QuizUsers.fumo_count))
         .group_by(QuizUsers.user_id)
+        .order_by(desc("fumo_count"))
         .limit(10)
     )
-    return result.scalars().all()
+    return result.all()
