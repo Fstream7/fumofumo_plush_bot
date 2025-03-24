@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, delete, update, desc
 from sqlalchemy.sql.expression import func
-from .models import Fumo, QuizUsers
+from .models import Fumo, QuizUsers, QuizResults
 
 
 class FumoCache:
@@ -133,24 +133,27 @@ async def db_quiz_add_entry(
 ) -> str:
     """
     If record with user_id, fumo_id and group_id exist - increase fumo_count for it.
-    If user name was changed - update it for all records with same user_id.
+    If user name was changed - update it.
     If record not exist - create new one.
     """
-    result = await session.execute(select(QuizUsers).
-                                   where(
-                                       QuizUsers.user_id == user_id,
-                                       QuizUsers.fumo_id == fumo_id,
-                                       QuizUsers.group_id == group_id
+    quiz_entry_result = await session.execute(select(QuizResults)
+                                              .where(
+        QuizResults.user_id == user_id,
+        QuizResults.fumo_id == fumo_id,
+        QuizResults.group_id == group_id
     ))
-    quiz_entry = result.scalar_one_or_none()
+    quiz_entry = quiz_entry_result.scalar_one_or_none()
     if quiz_entry:
         quiz_entry.fumo_count += 1
-        if quiz_entry.user_name != user_name:
-            await session.execute(update(QuizUsers)
-                                  .where(QuizUsers.user_id == user_id)
-                                  .values(user_name=user_name))
+        quiz_user_result = await session.execute(select(QuizUsers)
+                                                 .where(QuizUsers.user_id == user_id))
+        quiz_user = quiz_user_result.scalar_one_or_none()
+        if user_name != quiz_user.user_name:
+            quiz_user.user_name = user_name
     else:
-        quiz_entry = QuizUsers(user_id=user_id, user_name=user_name, fumo_id=fumo_id, group_id=group_id, fumo_count=1)
+        quiz_user = QuizUsers(user_id=user_id, user_name=user_name)
+        session.add(quiz_user)
+        quiz_entry = QuizResults(user_id=user_id, fumo_id=fumo_id, fumo_count=1, group_id=group_id)
         session.add(quiz_entry)
     try:
         await session.commit()
@@ -163,11 +166,11 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
     result = await session.execute(
         select(
             Fumo.name.label("fumo_name"),
-            QuizUsers.fumo_count.label("fumo_count")
+            QuizResults.fumo_count.label("fumo_count")
         )
-        .join(QuizUsers, Fumo.id == QuizUsers.fumo_id)
-        .where(QuizUsers.user_id == user_id, QuizUsers.group_id == group_id)
-        .order_by(desc(QuizUsers.fumo_count))
+        .join(QuizResults, Fumo.id == QuizResults.fumo_id)
+        .where(QuizResults.user_id == user_id, QuizResults.group_id == group_id)
+        .order_by(desc(QuizResults.fumo_count))
     )
     return result.all()
 
@@ -175,11 +178,12 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
 async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> str:
     result = await session.execute(
         select(
-            QuizUsers.user_id,
+            QuizResults.user_id,
             QuizUsers.user_name,
-            func.sum(QuizUsers.fumo_count).label("fumo_count")
+            func.sum(QuizResults.fumo_count).label("fumo_count")
         )
-        .where(QuizUsers.group_id == group_id)
+        .join(QuizResults, QuizUsers.user_id == QuizResults.user_id)
+        .where(QuizResults.group_id == group_id)
         .group_by(QuizUsers.user_id, QuizUsers.user_name)
         .order_by(desc("fumo_count"))
         .limit(10)

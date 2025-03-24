@@ -127,6 +127,7 @@ async def cmd_delete_fumo_from_db(callback: types.CallbackQuery, state: FSMConte
     await state.update_data(message_to_delete=callback.message)
     await callback.message.answer(
         f"You are about to delete fumo {fumo_name}. Is that correct?\n"
+        "Fumo will be removed from the collection of all users if it in the quiz"
         "⚠️Warning, fumo id cache will be rebuilded.⚠️",
         reply_markup=confirm_buttons()
     )
