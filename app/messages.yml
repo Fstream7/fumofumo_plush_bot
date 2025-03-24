@@ -67,10 +67,11 @@ privacy: |
   3. Groups:
     Messages in groups are processed for the content of blacklisted words for antispam.
     When participating in the quiz, your name and user_id will be saved in db for leaderboard. 
+    Only members of the same group can see it.
     You can contact the bot administrator to delete this data.
 
   Contact
-  If you have any questions or concerns about this privacy policy, please contact the bot owner directly.
+  If you have any questions or concerns about this privacy policy, please contact the bot owner directly using this bot.
 
 blacklist_ban_message: "Deleted message from {user_full_name} containing word from blacklist"
 blacklist_words:
