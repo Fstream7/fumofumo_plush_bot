@@ -35,6 +35,7 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
             await state.set_state(QuizForm.quiz_fumo)
             await state.update_data(fumo_name=fumo.name)
             await state.update_data(fumo_id=fumo.id)
+            await state.update_data(fumo_link=fumo.source_link)
             await state.update_data(quiz_message=quiz_message)
     else:
         await message.reply("You are not allowed to perform this operation")
@@ -48,6 +49,7 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
     if message.reply_to_message.message_id == quiz_message.message_id:
         if message.text.lower() == fumo_name.lower() or message.text.lower() == fumo_name.split()[0].lower():
             fumo_id = user_data['fumo_id']
+            fumo_link = user_data['fumo_link']
             await db_quiz_add_entry(
                 session,
                 user_id=message.from_user.id,
@@ -55,7 +57,9 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
                 fumo_id=fumo_id,
                 group_id=message.chat.id
             )
-            await message.reply(Messages.quiz_success_message.format(fumo=fumo_name))
+            await message.reply(
+                Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link}")
+            )
             await quiz_message.delete()
             await state.clear()
         else:
