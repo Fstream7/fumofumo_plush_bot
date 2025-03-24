@@ -186,7 +186,7 @@ async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> lis
         )
         .join(QuizUsers, QuizResults.user_id == QuizUsers.user_id)
         .where(QuizResults.group_id == group_id)
-        .group_by(QuizResults.user_id, QuizUsers.user_name)
+        .group_by(QuizUsers.user_id, QuizUsers.user_name)
         .order_by(desc("fumo_count"))
         .limit(10)
     )
