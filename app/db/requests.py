@@ -124,11 +124,17 @@ async def db_get_random_fumo_for_quiz(session: AsyncSession) -> str:
     return result.scalar_one_or_none()
 
 
-async def db_quiz_add_entry(session: AsyncSession, user_id: float, user_name: str, fumo_id: int, group_id: float) -> str:
+async def db_quiz_add_entry(
+        session: AsyncSession,
+        user_id: float,
+        user_name: str,
+        fumo_id: int,
+        group_id: float
+) -> str:
     """
     If record with user_id, fumo_id and group_id exist - increase fumo_count for it.
     If user name was changed - update it for all records with same user_id.
-    If record not exist - create new one. 
+    If record not exist - create new one.
     """
     result = await session.execute(select(QuizUsers).
                                    where(

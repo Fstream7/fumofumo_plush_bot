@@ -59,8 +59,6 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
             await quiz_message.delete()
             await state.clear()
         else:
-            print(message.text)
-            print(fumo_name.split())
             await message.reply(Messages.quiz_fail_message)
 
 
