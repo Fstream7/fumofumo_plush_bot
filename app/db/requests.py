@@ -39,8 +39,14 @@ async def db_get_fumo_by_id(session: AsyncSession, fumo_id: int) -> Fumo:
     if len(fumo_ids_cache) == 0:
         return None
     fumo_list_id = fumo_ids_cache[fumo_id % len(fumo_ids_cache)]
-    result = await session.execute(select(Fumo).where(Fumo.id == fumo_list_id))
-    return result.scalar_one_or_none()
+    result = await session.execute(
+        select(Fumo.name,
+               Fumo.file_id,
+               Fumo.source_link,
+               )
+        .where(Fumo.id == fumo_list_id)
+    )
+    return result.one_or_none()
 
 
 async def db_show_all_fumos(session: AsyncSession) -> list[Fumo]:
@@ -168,7 +174,7 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
     result = await session.execute(
         select(
             Fumo.name.label("fumo_name"),
-            QuizResults.fumo_count.label("fumo_count")
+            QuizResults.fumo_count
         )
         .join(QuizResults, Fumo.id == QuizResults.fumo_id)
         .where(QuizResults.user_id == user_id, QuizResults.group_id == group_id)
