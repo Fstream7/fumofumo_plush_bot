@@ -2,7 +2,7 @@
 Silly telegram bot. 
 -  If anyone joins, leaves, or is banned from a group, the bot will notify about it with a text and a sticker.
 - Users can propose posts to the channel with private messages.
-- fumofumo database for fun. Each user can get his daily fumo based on his userid and current day. This data is hashed and salting to get the most random and untreckable, but repeatable result.
+- fumofumo database for fun. Each user can get his daily fumo based on his userid and current day. This data is hashed and salting to get the most random and untreckable, but repeatable result. Records from database can be used for quiz. 
 - admin can add, edit and delete fumos from db using chat with bot. 
 - Delete messages in group with NFT sites or any other blacklisted words.
 
