@@ -1,7 +1,7 @@
 from typing import Optional
 from os import path
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator, field_validator
+from pydantic import SecretStr, BaseModel, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
