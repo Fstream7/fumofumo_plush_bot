@@ -31,6 +31,9 @@ class Messages(BaseModel):
     quiz_success_message: str
     quiz_fail_message: str
     quiz_no_fumos_in_collection_message: str
+    quiz_finish_animation_id: str
+    quiz_finish_win_message: str
+    quiz_finish_fail_message: str
 
 
 class Settings(BaseSettings):

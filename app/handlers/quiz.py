@@ -3,6 +3,8 @@ from aiogram.filters import Command
 from aiogram import Router, types, F
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from typing import Optional
+from aiogram.types import input_media_animation
 from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -19,19 +21,44 @@ class QuizForm(StatesGroup):
     quiz_fumo = State()
 
 
+async def end_quiz(state: FSMContext, user_name: Optional[str]) -> None:
+    """
+    End quiz and clear state
+    """
+    user_data = await state.get_data()
+    quiz_message = user_data.get('quiz_message')
+    if quiz_message:
+        if user_name:
+            await quiz_message.edit_media(
+                media=input_media_animation.InputMediaAnimation(
+                    type="animation",
+                    media=Messages.quiz_finish_animation_id,
+                    caption=Messages.quiz_finish_win_message.format(user_full_name=user_name))
+            )
+        else:
+            await quiz_message.edit_media(
+                media=input_media_animation.InputMediaAnimation(
+                    type="animation",
+                    media=Messages.quiz_finish_animation_id,
+                    caption=Messages.quiz_finish_fail_message
+                )
+            )
+    await state.clear()
+
+
 @router.message(Command("quiz"))
 async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
     """
-    Allow admin to manual start quiz in chat. Clean any previus quiz.
+    Allow admin to manual start quiz in chat. End any previus quiz.
     Todo: replace this command with scheduler.
     """
     if message.from_user.id == Config.ADMIN_CHAT_ID:
         fumo = await db_get_random_fumo_for_quiz(session)
         if fumo:
+            await end_quiz(state, user_name=None)
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id,
                 caption=Messages.quiz_guess_message)
-            await state.clear()
             await state.set_state(QuizForm.quiz_fumo)
             await state.update_data(fumo_name=fumo.name)
             await state.update_data(fumo_id=fumo.id)
@@ -60,8 +87,7 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
             await message.reply(
                 Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link}")
             )
-            await quiz_message.delete()
-            await state.clear()
+            await end_quiz(state, user_name=message.from_user.full_name)
         else:
             await message.reply(Messages.quiz_fail_message)
 
