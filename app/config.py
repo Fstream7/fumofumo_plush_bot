@@ -46,18 +46,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
-    HASH_SALT: Optional[SecretStr] = SecretStr("salt")
+    HASH_SALT: SecretStr = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
     QUIZ_CHAT_ID: Optional[int] = None
-    model_config = SettingsConfigDict(env_file='.env')
-
-    @field_validator("QUIZ_CHAT_ID", mode="before")
-    @classmethod
-    def empty_string_to_none(cls, input):
-        """Convert empty fields from docker to None for Optional[int] values"""
-        if input == '':
-            return None
-        return input
+    model_config = SettingsConfigDict(env_file='.env', env_ignore_empty=True)
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":
