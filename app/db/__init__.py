@@ -1,7 +1,9 @@
 from .base import Base
-from .models import Fumo
+from .models import Fumo, QuizUsers, QuizResults
 
 __all__ = [
     "Base",
-    "Fumo"
+    "Fumo",
+    "QuizUsers",
+    "QuizResults",
 ]

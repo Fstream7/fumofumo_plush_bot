@@ -27,11 +27,18 @@ class Messages(BaseModel):
     privacy: str
     blacklist_words: list[str]
     blacklist_ban_message: str
+    quiz_guess_message:  str
+    quiz_success_message: str
+    quiz_fail_message: str
+    quiz_no_fumos_in_collection_message: str
+    quiz_finish_animation_id: str
+    quiz_finish_win_message: str
+    quiz_finish_fail_message: str
 
 
 class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: SecretStr
-    ADMIN_CHAT_ID: Optional[int] = None
+    ADMIN_CHAT_ID: int
     LOG_LEVEL: str = "INFO"
     DATABASE_URI: Optional[SecretStr] = None
     POSTGRES_HOST: str = "localhost"
@@ -39,9 +46,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
-    HASH_SALT: Optional[SecretStr] = SecretStr("salt")
+    HASH_SALT: SecretStr = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
-    model_config = SettingsConfigDict(env_file='.env')
+    QUIZ_CHAT_ID: Optional[int] = None
+    model_config = SettingsConfigDict(env_file='.env', env_ignore_empty=True)
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":
