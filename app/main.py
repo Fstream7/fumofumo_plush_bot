@@ -29,7 +29,7 @@ async def main() -> None:
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
     dp.startup.register(start_bot)
     dp.include_routers(*collect_routers())
-    setup_scheduler(sessionmaker())
+    setup_scheduler(sessionmaker(), bot, dp)
     try:
         await dp.start_polling(bot)
     finally:

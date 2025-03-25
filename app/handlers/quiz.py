@@ -1,9 +1,11 @@
 
 from aiogram.filters import Command
-from aiogram import Router, types, F
+from aiogram import Router, types, F, Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from typing import Optional
+from random import randint
+import asyncio
 from aiogram.types import input_media_animation
 from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
@@ -21,7 +23,7 @@ class QuizForm(StatesGroup):
     quiz_fumo = State()
 
 
-async def end_quiz(state: FSMContext, user_name: Optional[str]) -> None:
+async def quiz_end(state: FSMContext, user_name: Optional[str]) -> None:
     """
     End quiz and clear state
     """
@@ -46,6 +48,31 @@ async def end_quiz(state: FSMContext, user_name: Optional[str]) -> None:
     await state.clear()
 
 
+async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, chat_id: int, max_delay: int = 0):
+    """
+    Function for scheduler to post quiz periodically.
+    Random delay on max_delay time to make quiz more random
+    """
+    delay = randint(0, max_delay)
+    await asyncio.sleep(delay)
+    state = dispatcher.fsm.get_context(
+        bot=bot, chat_id=chat_id, user_id=chat_id
+    )
+    fumo = await db_get_random_fumo_for_quiz(session)
+    if fumo:
+        await quiz_end(state, user_name=None)
+        quiz_message = await bot.send_photo(
+            chat_id=chat_id,
+            photo=fumo.file_id,
+            caption=Messages.quiz_guess_message)
+        await state.set_state(QuizForm.quiz_fumo)
+        await state.update_data(fumo_name=fumo.name)
+        await state.update_data(fumo_id=fumo.id)
+        await state.update_data(fumo_link=fumo.source_link)
+        await state.update_data(quiz_message=quiz_message)
+    await session.close()
+
+
 @router.message(Command("quiz"))
 async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
     """
@@ -55,7 +82,7 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
     if message.from_user.id == Config.ADMIN_CHAT_ID:
         fumo = await db_get_random_fumo_for_quiz(session)
         if fumo:
-            await end_quiz(state, user_name=None)
+            await quiz_end(state, user_name=None)
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id,
                 caption=Messages.quiz_guess_message)
@@ -87,7 +114,7 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
             await message.reply(
                 Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link}")
             )
-            await end_quiz(state, user_name=message.from_user.full_name)
+            await quiz_end(state, user_name=message.from_user.full_name)
         else:
             await message.reply(Messages.quiz_fail_message)
 

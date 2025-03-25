@@ -48,6 +48,7 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: Optional[SecretStr] = None
     HASH_SALT: Optional[SecretStr] = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
+    QUIZ_CHAT_ID: Optional[int] = None
     model_config = SettingsConfigDict(env_file='.env')
 
     @model_validator(mode="after")

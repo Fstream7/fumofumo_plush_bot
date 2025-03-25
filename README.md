@@ -24,6 +24,7 @@ Silly telegram bot.
 - `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
 - `HASH_SALT` Optional salt for [hashing](https://docs.python.org/3/library/hashlib.html#randomized-hashing).
 - `TIMEZONE` Timezone for scheduler and commands that work with time. If not provided - UTC timezone wil be used. 
+- `QUIZ_CHAT_ID` Chat id to post quiz. Start bot and send him */id* command in chat where you want to receive quiz. 
 ### env for postgres (if they are not specified, then sqlite will be used):
 - `POSTGRES_HOST` postgress db host
 - `POSTGRES_PORT`  postgress db port
