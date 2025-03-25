@@ -1,0 +1,30 @@
+web:
+  host: 127.0.0.1
+models:
+  fumobot:
+    schedule:
+      # At 12:00 on Sunday.
+      cron: "0 12 * * sun"
+    storages:
+      local:
+        type: local
+        keep: 10
+        path: /root/backups
+    compress_with:
+      type: tgz
+    databases:
+      fumobot_db:
+        type: postgresql
+        host: $POSTGRES_HOST
+        port: $POSTGRES_PORT
+        database: $POSTGRES_DB
+        username: $POSTGRES_USER
+        password: $POSTGRES_PASSWORD
+    archive:
+      includes:
+        - /var/media
+    notifiers:
+      telegram:
+        type: telegram
+        chat_id: $ADMIN_CHAT_ID
+        token: $TELEGRAM_BOT_TOKEN

@@ -17,6 +17,7 @@ Silly telegram bot.
 * sqlalchemy asyncio wth SQLite for development or Postgres for production
 * Docker and Docker Compose
 * GitHub  workflow linter and build
+* [Gobackup](https://github.com/gobackup/gobackup) backup tool
 
 ## environment variables
 - `TELEGRAM_BOT_TOKEN=Your_token`
@@ -74,7 +75,7 @@ Or with docker compose
 ```bash
 # for development, with sqlite
 docker compose -f docker-compose-dev.yml up
-# for production, with postgres
+# for production, with postgres and basic backup
 docker compose -f docker-compose.yml up -d 
 ```
 
