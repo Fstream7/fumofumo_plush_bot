@@ -15,3 +15,4 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - HASH_SALT=${HASH_SALT:-salt}
       - TIMEZONE=${TIMEZONE:-UTC}
+      - QUIZ_CHAT_ID=${QUIZ_CHAT_ID}
