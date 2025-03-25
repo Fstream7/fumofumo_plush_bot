@@ -21,7 +21,7 @@ Silly telegram bot.
 ## environment variables
 - `TELEGRAM_BOT_TOKEN=Your_token`
 - `LOG_LEVEL=INFO` loglevel
-- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
+- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot with default value and send him */id* command
 - `HASH_SALT` Optional salt for [hashing](https://docs.python.org/3/library/hashlib.html#randomized-hashing).
 - `TIMEZONE` Timezone for scheduler and commands that work with time. If not provided - UTC timezone wil be used. 
 - `QUIZ_CHAT_ID` Chat id to post quiz. Start bot and send him */id* command in chat where you want to receive quiz. 

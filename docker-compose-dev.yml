@@ -12,7 +12,7 @@ services:
     environment:
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - HASH_SALT=${HASH_SALT:-salt}
-      - TIMEZONE=${TIMEZONE:-UTC}
-      - QUIZ_CHAT_ID=${QUIZ_CHAT_ID}
+      - LOG_LEVEL=${LOG_LEVEL:-}
+      - HASH_SALT=${HASH_SALT:-}
+      - TIMEZONE=${TIMEZONE:-}
+      - QUIZ_CHAT_ID=${QUIZ_CHAT_ID:-}

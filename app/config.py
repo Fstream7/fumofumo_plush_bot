@@ -1,7 +1,7 @@
 from typing import Optional
 from os import path
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator
+from pydantic import SecretStr, BaseModel, model_validator, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
@@ -38,7 +38,7 @@ class Messages(BaseModel):
 
 class Settings(BaseSettings):
     TELEGRAM_BOT_TOKEN: SecretStr
-    ADMIN_CHAT_ID: Optional[int] = None
+    ADMIN_CHAT_ID: int
     LOG_LEVEL: str = "INFO"
     DATABASE_URI: Optional[SecretStr] = None
     POSTGRES_HOST: str = "localhost"
@@ -50,6 +50,14 @@ class Settings(BaseSettings):
     TIMEZONE: TimeZoneName = "UTC"
     QUIZ_CHAT_ID: Optional[int] = None
     model_config = SettingsConfigDict(env_file='.env')
+
+    @field_validator("QUIZ_CHAT_ID", mode="before")
+    @classmethod
+    def empty_string_to_none(cls, input):
+        """Convert empty fields from docker to None for Optional[int] values"""
+        if input == '':
+            return None
+        return input
 
     @model_validator(mode="after")
     def validate_db_uri(self) -> "Settings":
