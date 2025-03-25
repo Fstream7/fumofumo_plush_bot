@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from typing import Optional
 from random import randint
 import asyncio
+import logging
 from aiogram.types import input_media_animation
 from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
@@ -54,6 +55,7 @@ async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, ch
     Random delay on max_delay time to make quiz more random
     """
     delay = randint(0, max_delay)
+    logging.info(f"Delayed quiz_start on {delay} seconds")
     await asyncio.sleep(delay)
     state = dispatcher.fsm.get_context(
         bot=bot, chat_id=chat_id, user_id=chat_id
@@ -133,5 +135,6 @@ async def cmd_my_fumos(message: types.Message, session: AsyncSession) -> None:
 async def cmd_leaderboard(message: types.Message, session: AsyncSession) -> None:
     result = await db_quiz_get_leaderboard(session, group_id=message.chat.id)
     if len(result) > 0:
-        fumo_names_text = "\n".join([f"{row.user_name} - {str(row.fumo_count)}" for row in result])
+        fumo_names_text = "Top 10 users by fumo count: \n"
+        fumo_names_text += "\n".join([f"{row.user_name} - {str(row.fumo_count)}" for row in result])
         await message.reply(fumo_names_text)
