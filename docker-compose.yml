@@ -13,7 +13,7 @@ services:
       - PGDATA=/var/lib/postgresql/data
 
   telegram_bot:
-    image:  ghcr.io/fstream7/fumofumo_plush_bot:dev
+    image:  ghcr.io/fstream7/fumofumo_plush_bot:main
     restart: always
     volumes:
       - "media:/app/media:rw"
