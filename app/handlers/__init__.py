@@ -1,7 +1,7 @@
 from aiogram import Router
 from . import get_id
 from . import fumofumo
-from . import quiz
+from . import group_quiz
 from . import group_members
 from . import group_delete_messages_with_blacklist
 from . import privacy
@@ -15,7 +15,7 @@ def collect_routers() -> list[Router]:
         start.router,
         privacy.router,
         fumofumo.router,
-        quiz.router,
+        group_quiz.router,
         get_id.router,
         private_admin.router,
         private_users.router,

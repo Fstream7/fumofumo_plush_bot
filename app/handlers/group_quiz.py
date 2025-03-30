@@ -3,6 +3,7 @@ from aiogram.filters import Command
 from aiogram import Router, types, F, Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramBadRequest
 from typing import Optional
 from random import randint
 import asyncio
@@ -27,25 +28,29 @@ class QuizForm(StatesGroup):
 async def quiz_end(state: FSMContext, user_name: Optional[str]) -> None:
     """
     End quiz and clear state
+    Ignore TelegramBadRequest error if bot cant edit post
     """
-    user_data = await state.get_data()
-    quiz_message = user_data.get('quiz_message')
-    if quiz_message:
-        if user_name:
-            await quiz_message.edit_media(
-                media=input_media_animation.InputMediaAnimation(
-                    type="animation",
-                    media=Messages.quiz_finish_animation_id,
-                    caption=Messages.quiz_finish_win_message.format(user_full_name=user_name))
-            )
-        else:
-            await quiz_message.edit_media(
-                media=input_media_animation.InputMediaAnimation(
-                    type="animation",
-                    media=Messages.quiz_finish_animation_id,
-                    caption=Messages.quiz_finish_fail_message
+    try:
+        user_data = await state.get_data()
+        quiz_message = user_data.get('quiz_message')
+        if quiz_message:
+            if user_name:
+                await quiz_message.edit_media(
+                    media=input_media_animation.InputMediaAnimation(
+                        type="animation",
+                        media=Messages.quiz_finish_animation_id,
+                        caption=Messages.quiz_finish_win_message.format(user_full_name=user_name))
                 )
-            )
+            else:
+                await quiz_message.edit_media(
+                    media=input_media_animation.InputMediaAnimation(
+                        type="animation",
+                        media=Messages.quiz_finish_animation_id,
+                        caption=Messages.quiz_finish_fail_message
+                    )
+                )
+    except TelegramBadRequest as error:
+        logging.waring(error)
     await state.clear()
 
 
@@ -93,8 +98,6 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
             await state.update_data(fumo_id=fumo.id)
             await state.update_data(fumo_link=fumo.source_link)
             await state.update_data(quiz_message=quiz_message)
-    else:
-        await message.reply("You are not allowed to perform this operation")
 
 
 @router.message(QuizForm.quiz_fumo, F.text, QuizReplyFilter())
@@ -114,7 +117,7 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
                 group_id=message.chat.id
             )
             await message.reply(
-                Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link}")
+                Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link if fumo_link else ''}".strip())
             )
             await quiz_end(state, user_name=message.from_user.full_name)
         else:

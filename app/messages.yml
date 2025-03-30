@@ -112,5 +112,5 @@ quiz_success_message: |
 quiz_fail_message: "Wrong."
 quiz_no_fumos_in_collection_message: "You dont have any fumos in your collection yet"
 quiz_finish_animation_id: "CgACAgQAAxkBAAIbt2ficQuDZO0PVLvGpoBe7J9K15e2AAKZBgACRrQsUzDObhxaA67SNgQ"
-quiz_finish_win_message: "Quiz guessed by {user_full_name}"
-quiz_finish_fail_message: "No one guess this, fumo is going back to Gensoukyou"
+quiz_finish_win_message: "Quiz solved by {user_full_name}"
+quiz_finish_fail_message: "No one solved this, fumo is going back to Gensoukyou"

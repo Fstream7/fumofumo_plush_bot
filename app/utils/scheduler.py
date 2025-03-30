@@ -5,7 +5,7 @@ from apscheduler.triggers.cron import CronTrigger
 from aiogram import Bot, Dispatcher
 from pytz import timezone
 from config import Config
-from handlers.quiz import quiz_start
+from handlers.group_quiz import quiz_start
 
 
 def setup_scheduler(session: AsyncSession, bot: Bot, dp: Dispatcher):
