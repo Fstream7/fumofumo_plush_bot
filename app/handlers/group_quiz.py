@@ -8,7 +8,8 @@ from typing import Optional
 from random import randint
 import asyncio
 import logging
-from aiogram.types import input_media_animation
+from aiogram.enums import ParseMode
+from aiogram.types import input_media_animation, LinkPreviewOptions
 from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,6 +17,7 @@ from filters.quiz_reply import QuizReplyFilter
 from filters.chat_type import ChatTypeFilter
 from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
 from db.requests import db_quiz_get_leaderboard
+from utils.escape_for_markdown import escape_markdown
 
 router = Router()
 router.message.filter(ChatTypeFilter(chat_type=["group", "supergroup"]))
@@ -117,7 +119,8 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
                 group_id=message.chat.id
             )
             await message.reply(
-                Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link if fumo_link else ''}".strip())
+                Messages.quiz_success_message.format(fumo=f"{fumo_name} {fumo_link if fumo_link else ''}".strip()),
+                link_preview_options=LinkPreviewOptions(is_disabled=True)
             )
             await quiz_end(state, user_name=message.from_user.full_name)
         else:
@@ -128,8 +131,13 @@ async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: F
 async def cmd_my_fumos(message: types.Message, session: AsyncSession) -> None:
     result = await db_quiz_get_records_for_user_id(session, user_id=message.from_user.id, group_id=message.chat.id)
     if len(result) > 0:
-        fumo_names_text = "\n".join([f"{row.fumo_name} - {str(row.fumo_count)}" for row in result])
-        await message.reply(fumo_names_text)
+        fumo_names_text = "\n".join(
+            [f"[{escape_markdown(row.fumo_name)}]({row.fumo_link}) \\- {row.fumo_count}" for row in result]
+        )
+        await message.reply(
+            fumo_names_text,
+            parse_mode=ParseMode.MARKDOWN_V2,
+            link_preview_options=LinkPreviewOptions(is_disabled=True))
     else:
         await message.reply(Messages.quiz_no_fumos_in_collection_message)
 

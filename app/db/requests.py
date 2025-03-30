@@ -174,6 +174,7 @@ async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float,
     result = await session.execute(
         select(
             Fumo.name.label("fumo_name"),
+            Fumo.source_link.label("fumo_link"),
             QuizResults.fumo_count
         )
         .join(QuizResults, Fumo.id == QuizResults.fumo_id)
