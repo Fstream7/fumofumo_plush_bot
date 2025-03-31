@@ -4,8 +4,8 @@ pydantic-settings==2.8.1
 pydantic-extra-types==2.10.3
 PyYAML==6.0.2
 Alembic==1.15.1
-asyncpg==0.30.0
-aiosqlite==0.21.0
+asyncpg==0.30.0 # only need for postgres
+aiosqlite==0.21.0 # only need for sqlite
 sqlalchemy[asyncio]==2.0.39
 apscheduler==3.11.0
 tzdata==2025.2
