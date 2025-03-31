@@ -13,14 +13,13 @@ from aiogram.types import input_media_animation, LinkPreviewOptions
 from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
 from sqlalchemy.ext.asyncio import AsyncSession
-from filters.quiz_reply import QuizReplyFilter
-from filters.chat_type import ChatTypeFilter
+from filters.quiz import QuizFilter, QuizReplyFilter
 from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
 from db.requests import db_quiz_get_leaderboard
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
-router.message.filter(ChatTypeFilter(chat_type=["group", "supergroup"]))
+router.message.filter(QuizFilter)
 
 
 class QuizForm(StatesGroup):
@@ -86,7 +85,6 @@ async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, ch
 async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
     """
     Allow admin to manual start quiz in chat. End any previus quiz.
-    Todo: replace this command with scheduler.
     """
     if message.from_user.id == Config.ADMIN_CHAT_ID:
         fumo = await db_get_random_fumo_for_quiz(session)

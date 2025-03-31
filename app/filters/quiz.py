@@ -1,6 +1,16 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 from aiogram import Bot
+from config import Config
+
+
+class QuizFilter(BaseFilter):
+    """
+    Limit quiz commands with quiz group
+    """
+
+    async def __call__(self, message: Message, bot: Bot) -> bool:
+        return message.chat.id == Config.QUIZ_CHAT_ID
 
 
 class QuizReplyFilter(BaseFilter):
