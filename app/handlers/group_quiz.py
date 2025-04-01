@@ -19,7 +19,7 @@ from db.requests import db_quiz_get_leaderboard
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
-router.message.filter(QuizFilter)
+router.message.filter((QuizFilter()))
 
 
 class QuizForm(StatesGroup):
