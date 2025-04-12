@@ -12,7 +12,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.strategy import FSMStrategy
 
 
-async def start_bot(bot: Bot):
+async def start_bot(bot: Bot) -> None:
     await set_commands(bot)
 
 
@@ -21,7 +21,7 @@ async def main() -> None:
         logging.info("Using postgres DB")
     elif "sqlite+aiosqlite:///" in Config.DATABASE_URI.get_secret_value():
         logging.info("Using sqlite DB")
-    logging.info(f"Using timezone {Config.TIMEZONE}")
+    logging.info("Using timezone %s", {Config.TIMEZONE})
     engine = create_async_engine(url=Config.DATABASE_URI.get_secret_value(), echo=True)
     sessionmaker = async_sessionmaker(engine, expire_on_commit=False)
     bot = Bot(token=Config.TELEGRAM_BOT_TOKEN.get_secret_value())
@@ -29,11 +29,12 @@ async def main() -> None:
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
     dp.startup.register(start_bot)
     dp.include_routers(*collect_routers())
-    setup_scheduler(sessionmaker(), bot, dp)
+    scheduler = setup_scheduler(sessionmaker(), bot, dp)
     try:
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
+        scheduler.shutdown()
 
 
 if __name__ == "__main__":

@@ -281,11 +281,11 @@ async def download_fumo_images(
     for fumo in fumos:
         try:
             if os.path.isfile(f"{path}/{fumo.name}.jpg"):
-                logging.info(f"{path}/{fumo.name}.jpg already exists")
+                logging.info("%s/%s.jpg already exists", path, fumo.name)
                 continue
             file = await bot.get_file(fumo.file_id)
             await bot.download_file(file.file_path, f"{path}/{fumo.name}.jpg")
-            logging.info(f"{path}/{fumo.name}.jpg downloaded")
+            logging.info("%s/%s.jpg downloaded", path, fumo.name)
         except Exception as e:
             await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
             continue

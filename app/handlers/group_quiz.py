@@ -1,22 +1,22 @@
-from aiogram.filters import Command
+import asyncio
+import logging
+from typing import Optional
+from random import randint, random
 from aiogram import Router, types, F, Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
-from typing import Optional
-from random import randint
-import asyncio
-from random import random
-import logging
+from aiogram.filters import Command
 from aiogram.enums import ParseMode
 from aiogram.types import input_media_animation, LinkPreviewOptions
 from config import Messages, Config
+from db.models import Fumo
 from db.requests import db_get_random_fumo_for_quiz
+from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
+from db.requests import db_quiz_get_leaderboard
 from sqlalchemy.ext.asyncio import AsyncSession
 from filters.quiz import QuizFilter, QuizReplyFilter
 from filters.message_from_channel import MessageFromChannelFilter
-from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
-from db.requests import db_quiz_get_leaderboard
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
@@ -29,12 +29,13 @@ class QuizForm(StatesGroup):
 
 async def quiz_end(state: FSMContext, user_name: Optional[str]) -> None:
     """
-    End quiz and clear state
+    Clear state context and end quiz by replacing image and text.
     Ignore TelegramBadRequest error if bot cant edit post
     """
     try:
-        user_data = await state.get_data()
-        quiz_message = user_data.get('quiz_message')
+        quiz_data = await state.get_data()
+        await state.clear()
+        quiz_message = quiz_data.get('quiz_message')
         if quiz_message:
             if user_name:
                 await quiz_message.edit_media(
@@ -52,17 +53,27 @@ async def quiz_end(state: FSMContext, user_name: Optional[str]) -> None:
                     )
                 )
     except TelegramBadRequest as error:
-        logging.waring(error)
-    await state.clear()
+        logging.warning(error)
 
 
-async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, chat_id: int, max_delay: int = 0):
+async def quiz_set_state(state: FSMContext, fumo: Fumo, quiz_message: types.Message) -> None:
+    """
+    Save quiz data in state context
+    """
+    await state.set_state(QuizForm.quiz_fumo)
+    await state.update_data(fumo_name=fumo.name)
+    await state.update_data(fumo_id=fumo.id)
+    await state.update_data(fumo_link=fumo.source_link)
+    await state.update_data(quiz_message=quiz_message)
+
+
+async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, chat_id: int, max_delay: int = 0) -> None:
     """
     Function for scheduler to post quiz periodically.
     Random delay on max_delay time to make quiz more random
     """
     delay = randint(0, max_delay)
-    logging.info(f"Delayed quiz_start on {delay} seconds")
+    logging.info("Delayed quiz_start on %d seconds", delay)
     await asyncio.sleep(delay)
     state = dispatcher.fsm.get_context(
         bot=bot, chat_id=chat_id, user_id=chat_id
@@ -74,11 +85,7 @@ async def quiz_start(session: AsyncSession, bot: Bot, dispatcher: Dispatcher, ch
             chat_id=chat_id,
             photo=fumo.file_id,
             caption=Messages.quiz_guess_message)
-        await state.set_state(QuizForm.quiz_fumo)
-        await state.update_data(fumo_name=fumo.name)
-        await state.update_data(fumo_id=fumo.id)
-        await state.update_data(fumo_link=fumo.source_link)
-        await state.update_data(quiz_message=quiz_message)
+        await quiz_set_state(state, fumo, quiz_message)
     await session.close()
 
 
@@ -94,11 +101,7 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id,
                 caption=Messages.quiz_guess_message)
-            await state.set_state(QuizForm.quiz_fumo)
-            await state.update_data(fumo_name=fumo.name)
-            await state.update_data(fumo_id=fumo.id)
-            await state.update_data(fumo_link=fumo.source_link)
-            await state.update_data(quiz_message=quiz_message)
+            await quiz_set_state(state, fumo, quiz_message)
 
 
 @router.message(MessageFromChannelFilter())
@@ -113,22 +116,18 @@ async def random_quiz_for_channel(message: types.Message, session: AsyncSession,
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id, caption=Messages.quiz_guess_message
             )
-            await state.set_state(QuizForm.quiz_fumo)
-            await state.update_data(fumo_name=fumo.name)
-            await state.update_data(fumo_id=fumo.id)
-            await state.update_data(fumo_link=fumo.source_link)
-            await state.update_data(quiz_message=quiz_message)
+            await quiz_set_state(state, fumo, quiz_message)
 
 
 @router.message(QuizForm.quiz_fumo, F.text, QuizReplyFilter())
 async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
-    user_data = await state.get_data()
-    fumo_name = user_data['fumo_name']
-    quiz_message = user_data['quiz_message']
+    quiz_data = await state.get_data()
+    fumo_name = quiz_data['fumo_name']
+    quiz_message = quiz_data['quiz_message']
     if message.reply_to_message.message_id == quiz_message.message_id:
         if message.text.lower() == fumo_name.lower() or message.text.lower() == fumo_name.split()[0].lower():
-            fumo_id = user_data['fumo_id']
-            fumo_link = user_data['fumo_link']
+            fumo_id = quiz_data['fumo_id']
+            fumo_link = quiz_data['fumo_link']
             await db_quiz_add_entry(
                 session,
                 user_id=message.from_user.id,

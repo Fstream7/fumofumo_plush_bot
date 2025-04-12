@@ -1,8 +1,7 @@
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import select, delete, update, desc
-from sqlalchemy.sql.expression import func
+from sqlalchemy import select, delete, update, desc, func
 from .models import Fumo, QuizUsers, QuizResults
 
 
@@ -122,10 +121,10 @@ async def db_update_fumo_quiz_by_name(session: AsyncSession, fumo_name: str, new
         return f"Error occurred: {str(e)}"
 
 
-async def db_get_random_fumo_for_quiz(session: AsyncSession) -> str:
+async def db_get_random_fumo_for_quiz(session: AsyncSession) -> Optional[Fumo]:
     result = await session.execute(select(Fumo)
                                    .where(Fumo.use_for_quiz)
-                                   .order_by(func.random())
+                                   .order_by(func.random())  # pylint: disable=not-callable
                                    .limit(1))
     return result.scalar_one_or_none()
 
