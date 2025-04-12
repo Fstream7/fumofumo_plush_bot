@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from typing import Optional
-from random import randint, random
+from random import randint
 from aiogram import Router, types, F, Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -16,7 +16,6 @@ from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
 from db.requests import db_quiz_get_leaderboard
 from sqlalchemy.ext.asyncio import AsyncSession
 from filters.quiz import QuizFilter, QuizReplyFilter
-from filters.message_from_channel import MessageFromChannelFilter
 from utils.escape_for_markdown import escape_markdown
 
 router = Router()
@@ -101,21 +100,6 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id,
                 caption=Messages.quiz_guess_message)
-            await quiz_set_state(state, fumo, quiz_message)
-
-
-@router.message(MessageFromChannelFilter())
-async def random_quiz_for_channel(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
-    """
-    Randomly reply messages from linked channel with quiz
-    """
-    if random() < 0.3:
-        fumo = await db_get_random_fumo_for_quiz(session)
-        if fumo:
-            await quiz_end(state, user_name=None)
-            quiz_message = await message.reply_photo(
-                photo=fumo.file_id, caption=Messages.quiz_guess_message
-            )
             await quiz_set_state(state, fumo, quiz_message)
 
 
