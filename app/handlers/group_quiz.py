@@ -1,4 +1,3 @@
-
 from aiogram.filters import Command
 from aiogram import Router, types, F, Bot, Dispatcher
 from aiogram.fsm.state import State, StatesGroup
@@ -7,6 +6,7 @@ from aiogram.exceptions import TelegramBadRequest
 from typing import Optional
 from random import randint
 import asyncio
+from random import random
 import logging
 from aiogram.enums import ParseMode
 from aiogram.types import input_media_animation, LinkPreviewOptions
@@ -14,6 +14,7 @@ from config import Messages, Config
 from db.requests import db_get_random_fumo_for_quiz
 from sqlalchemy.ext.asyncio import AsyncSession
 from filters.quiz import QuizFilter, QuizReplyFilter
+from filters.message_from_channel import MessageFromChannelFilter
 from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
 from db.requests import db_quiz_get_leaderboard
 from utils.escape_for_markdown import escape_markdown
@@ -93,6 +94,25 @@ async def cmd_quiz(message: types.Message, session: AsyncSession, state: FSMCont
             quiz_message = await message.reply_photo(
                 photo=fumo.file_id,
                 caption=Messages.quiz_guess_message)
+            await state.set_state(QuizForm.quiz_fumo)
+            await state.update_data(fumo_name=fumo.name)
+            await state.update_data(fumo_id=fumo.id)
+            await state.update_data(fumo_link=fumo.source_link)
+            await state.update_data(quiz_message=quiz_message)
+
+
+@router.message(MessageFromChannelFilter())
+async def random_quiz_for_channel(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
+    """
+    Randomly reply messages from linked channel with quiz
+    """
+    if random() < 0.3:
+        fumo = await db_get_random_fumo_for_quiz(session)
+        if fumo:
+            await quiz_end(state, user_name=None)
+            quiz_message = await message.reply_photo(
+                photo=fumo.file_id, caption=Messages.quiz_guess_message
+            )
             await state.set_state(QuizForm.quiz_fumo)
             await state.update_data(fumo_name=fumo.name)
             await state.update_data(fumo_id=fumo.id)
