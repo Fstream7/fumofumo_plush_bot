@@ -2,7 +2,7 @@
 Silly telegram bot. 
 -  If anyone joins, leaves, or is banned from a group, the bot will notify about it with a text and a sticker.
 - Users can propose posts to the channel with private messages.
-- fumofumo database for fun. Each user can get his daily fumo based on his userid and current day. This data is hashed and salting to get the most random and untreckable, but repeatable result.
+- fumofumo database for fun. Each user can get his daily fumo based on his userid and current day. This data is hashed and salting to get the most random and untreckable, but repeatable result. Records from database can be used for quiz. 
 - admin can add, edit and delete fumos from db using chat with bot. 
 - Delete messages in group with NFT sites or any other blacklisted words.
 
@@ -17,13 +17,15 @@ Silly telegram bot.
 * sqlalchemy asyncio wth SQLite for development or Postgres for production
 * Docker and Docker Compose
 * GitHub  workflow linter and build
+* [Gobackup](https://github.com/gobackup/gobackup) backup tool
 
 ## environment variables
 - `TELEGRAM_BOT_TOKEN=Your_token`
 - `LOG_LEVEL=INFO` loglevel
-- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot and send him */id* command
+- `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot with default value and send him */id* command
 - `HASH_SALT` Optional salt for [hashing](https://docs.python.org/3/library/hashlib.html#randomized-hashing).
 - `TIMEZONE` Timezone for scheduler and commands that work with time. If not provided - UTC timezone wil be used. 
+- `QUIZ_CHAT_ID` Chat id to post quiz. Start bot and send him */id* command in chat where you want to receive quiz. 
 ### env for postgres (if they are not specified, then sqlite will be used):
 - `POSTGRES_HOST` postgress db host
 - `POSTGRES_PORT`  postgress db port
@@ -73,7 +75,7 @@ Or with docker compose
 ```bash
 # for development, with sqlite
 docker compose -f docker-compose-dev.yml up
-# for production, with postgres
+# for production, with postgres and basic backup
 docker compose -f docker-compose.yml up -d 
 ```
 

@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from db.requests import db_add_fumo, FumoCache, db_show_all_fumos, db_search_fumos_by_name
 from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
 from db.requests import db_update_fumo_source_link_by_name, db_get_fumo_by_name
+from db.requests import db_update_fumo_quiz_by_name
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
 from utils.escape_for_markdown import escape_markdown
 
@@ -109,7 +110,7 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
             await message.answer_photo(
                 photo=fumo.file_id,
                 caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
-                reply_markup=edit_buttons(),
+                reply_markup=edit_buttons(enable_for_quiz_status=fumo.use_for_quiz),
                 parse_mode=ParseMode.MARKDOWN_V2
             )
         except Exception as e:
@@ -126,6 +127,7 @@ async def cmd_delete_fumo_from_db(callback: types.CallbackQuery, state: FSMConte
     await state.update_data(message_to_delete=callback.message)
     await callback.message.answer(
         f"You are about to delete fumo {fumo_name}. Is that correct?\n"
+        "Fumo will be removed from the collection of all users if it in the quiz"
         "⚠️Warning, fumo id cache will be rebuilded.⚠️",
         reply_markup=confirm_buttons()
     )
@@ -279,11 +281,11 @@ async def download_fumo_images(
     for fumo in fumos:
         try:
             if os.path.isfile(f"{path}/{fumo.name}.jpg"):
-                logging.info(f"{path}/{fumo.name}.jpg already exists")
+                logging.info("%s/%s.jpg already exists", path, fumo.name)
                 continue
             file = await bot.get_file(fumo.file_id)
             await bot.download_file(file.file_path, f"{path}/{fumo.name}.jpg")
-            logging.info(f"{path}/{fumo.name}.jpg downloaded")
+            logging.info("%s/%s.jpg downloaded", path, fumo.name)
         except Exception as e:
             await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
             continue
@@ -326,3 +328,16 @@ async def import_fumo_images(message: types.Message, command: CommandObject, ses
             await message.answer(f"Error occurred {str(e)}")
         await asyncio.sleep(1)
     await message.reply("Fumo images import finished")
+
+
+@router.callback_query(F.data == "toggle_fumo_for_quiz")
+async def cmd_toggle_fumo_for_quiz(callback: types.CallbackQuery, session: AsyncSession):
+    fumo_name = callback.message.caption
+    fumo = await db_get_fumo_by_name(session, fumo_name)
+    new_use_for_quiz = not fumo.use_for_quiz
+    result = await db_update_fumo_quiz_by_name(session, fumo_name, new_use_for_quiz)
+    await callback.message.edit_reply_markup(
+        reply_markup=edit_buttons(enable_for_quiz_status=new_use_for_quiz),
+    )
+    await callback.message.answer(result)
+    await callback.answer()

@@ -1,7 +1,7 @@
 from config import Messages
 from aiogram import Router, types
-from filters.chat_type import ChatTypeFilter
 from aiogram.exceptions import TelegramBadRequest
+from filters.chat_type import ChatTypeFilter
 
 
 router = Router()
