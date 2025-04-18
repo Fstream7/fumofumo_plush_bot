@@ -6,7 +6,7 @@ from aiogram.filters import Command, invert_f
 from config import Config, Messages
 from filters.chat_type import ChatTypeFilter
 from filters.admin import AdminFilter
-from decorators.media_group_handler import media_group_handler
+from decorators.media_group import media_group_decorator
 
 
 router = Router()
@@ -20,7 +20,7 @@ async def propose(message: types.Message) -> None:
 
 
 @router.message(F.media_group_id, F.content_type.in_({'photo', 'video', 'audio', 'document'}))
-@media_group_handler
+@media_group_decorator
 async def media_group(messages: List[types.Message], bot: Bot) -> None:
     await bot.send_message(
         Config.ADMIN_CHAT_ID,
