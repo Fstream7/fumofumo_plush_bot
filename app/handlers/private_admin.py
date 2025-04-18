@@ -25,7 +25,7 @@ router.message.filter(AdminFilter())
 
 
 class Form(StatesGroup):
-    get_stickers_id = State()
+    get_media_id = State()
     add_fumo = State()
     remove_fumo = State()
     edit_fumo_name = State()
@@ -46,15 +46,25 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
     await message.answer("Cancelled.")
 
 
-@router.message(Command("get_stickers_id"))
-async def cmd_start_get_stickers(message: types.Message, state: FSMContext) -> None:
-    await state.set_state(Form.get_stickers_id)
-    await message.answer("Send me a stickers, I will write their file_id. \nSend /cancel to stop")
+@router.message(Command("get_media_id"))
+async def cmd_start_get_media_id(message: types.Message, state: FSMContext) -> None:
+    await state.set_state(Form.get_media_id)
+    await message.answer("Send me a media, I will write their file_id. \nSend /cancel to stop")
 
 
-@router.message(Form.get_stickers_id, F.sticker)
+@router.message(Form.get_media_id, F.sticker)
 async def message_with_sticker(message: Message):
     await message.answer(f"Sticker file_id {message.sticker.file_id}")
+
+
+@router.message(Form.get_media_id, F.animation)
+async def message_with_animation(message: Message):
+    await message.answer(f"Animation file_id {message.animation.file_id}")
+
+
+@router.message(Form.get_media_id, F.photo)
+async def message_with_photo(message: Message):
+    await message.answer(f"Photo file_id {message.photo[-1].file_id}")
 
 
 @router.message(Command("add_fumo"))

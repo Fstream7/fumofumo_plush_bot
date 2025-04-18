@@ -11,7 +11,7 @@ async def set_commands(bot: Bot) -> None:
         BotCommand(command='id', description='Get current chat id'),
         BotCommand(command='fumo', description='Get random fumo face ᗜᴗᗜ'),
         BotCommand(command='fumofumo', description='Get Fumo of the day based on day and user id. '),
-        BotCommand(command='get_stickers_id', description='Get stickers file_id'),
+        BotCommand(command='get_media_id', description='Get media file_id'),
         BotCommand(command='add_fumo', description='Add fumos to database'),
         BotCommand(command='cancel', description='Cancel any operations'),
         BotCommand(command='list_fumos', description='List fumos by name in db.'),
