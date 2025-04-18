@@ -34,7 +34,7 @@ Silly telegram bot.
 - `POSTGRES_PASSWORD` postgress db password
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
-#### To get sticker id start bot and send him /get_stickers_id command from admin. 
+#### To get sticker id start bot and send him /get_media_id command from admin. 
 #### To add fumos to db start bot and send him /add_fumos command from admin. Send fumo images with names. Telegram allows sharing  stickers between bots, but each bot has a unique file_id for other media, so you have to re-upload them. 
 
 ## Run container
@@ -84,7 +84,7 @@ docker compose -f docker-compose.yml up -d
  - `/fumo` will return random fumo face ᗜᴗᗜ
  - `/fumofumo` will return fumo of the day based on day and user id. 
 ### Admin commands:
- - `/get_stickers_id` FSM, will return given sticker id
+ - `/get_media_id` FSM, will return given media id
  - `/add_fumo` FSM for adding fumos to db
  - `/cancel` exit from FSM
  - `/list_fumos` list all fumos in db.

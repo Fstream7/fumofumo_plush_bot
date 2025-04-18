@@ -25,7 +25,7 @@ router.message.filter(AdminFilter())
 
 
 class Form(StatesGroup):
-    get_stickers_id = State()
+    get_media_id = State()
     add_fumo = State()
     remove_fumo = State()
     edit_fumo_name = State()
@@ -46,15 +46,25 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
     await message.answer("Cancelled.")
 
 
-@router.message(Command("get_stickers_id"))
-async def cmd_start_get_stickers(message: types.Message, state: FSMContext) -> None:
-    await state.set_state(Form.get_stickers_id)
-    await message.answer("Send me a stickers, I will write their file_id. \nSend /cancel to stop")
+@router.message(Command("get_media_id"))
+async def cmd_start_get_media_id(message: types.Message, state: FSMContext) -> None:
+    await state.set_state(Form.get_media_id)
+    await message.answer("Send me a media, I will write their file_id. \nSend /cancel to stop")
 
 
-@router.message(Form.get_stickers_id, F.sticker)
+@router.message(Form.get_media_id, F.sticker)
 async def message_with_sticker(message: Message):
     await message.answer(f"Sticker file_id {message.sticker.file_id}")
+
+
+@router.message(Form.get_media_id, F.animation)
+async def message_with_animation(message: Message):
+    await message.answer(f"Animation file_id {message.animation.file_id}")
+
+
+@router.message(Form.get_media_id, F.photo)
+async def message_with_photo(message: Message):
+    await message.answer(f"Photo file_id {message.photo[-1].file_id}")
 
 
 @router.message(Command("add_fumo"))
@@ -70,10 +80,11 @@ async def cmd_add_fumo(message: types.Message, state: FSMContext) -> None:
 async def add_fumo(message: Message, session: AsyncSession):
     fumo_name = message.caption
     fumo_file_id = message.photo[-1].file_id
+    fumo_unique_id = message.photo[-1].file_unique_id
     fumo_link = None
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
-    result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
+    result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_unique_id, fumo_link)
     await message.reply(result)
     fumo = await db_get_fumo_by_name(session, fumo_name)
     await message.answer_photo(
@@ -204,8 +215,9 @@ async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMCon
     user_data = await state.get_data()
     fumo_name = user_data['fumo_to_edit']
     message_to_edit = user_data['message_to_edit']
-    new_fumo_file_id = message.photo[0].file_id
-    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id)
+    new_fumo_file_id = message.photo[-1].file_id
+    new_file_unique_id = message.photo[-1].file_unique_id
+    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id, new_file_unique_id)
     await message_to_edit.edit_media(
         media=input_media_photo.InputMediaPhoto(
             type="photo",
@@ -320,9 +332,20 @@ async def import_fumo_images(message: types.Message, command: CommandObject, ses
             fumo_photo = await message.answer_photo(FSInputFile(f"{path}/{fumo}"))
             fumo_name_exists_in_db = await db_get_fumo_by_name(session, fumo_name)
             if fumo_name_exists_in_db:
-                result = await db_update_fumo_file_id_by_name(session, fumo_name, fumo_photo.photo[-1].file_id)
+                result = await db_update_fumo_file_id_by_name(
+                    session,
+                    fumo_name,
+                    fumo_photo.photo[-1].file_id,
+                    fumo_photo.photo[-1].file_unique_id,
+                )
             else:
-                result = await db_add_fumo(session, fumo_name, fumo_photo.photo[-1].file_id, source_link=None)
+                result = await db_add_fumo(
+                    session,
+                    fumo_name,
+                    fumo_photo.photo[-1].file_id,
+                    fumo_photo.photo[-1].file_unique_id,
+                    source_link=None
+                )
             await message.reply(result)
         except Exception as e:
             await message.answer(f"Error occurred {str(e)}")

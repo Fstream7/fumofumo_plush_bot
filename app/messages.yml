@@ -111,6 +111,6 @@ quiz_success_message: |
   Use /my_fumos to see your fumos collection.
 quiz_fail_message: "Wrong."
 quiz_no_fumos_in_collection_message: "You dont have any fumos in your collection yet"
-quiz_finish_animation_id: "CgACAgQAAxkBAAIbt2ficQuDZO0PVLvGpoBe7J9K15e2AAKZBgACRrQsUzDObhxaA67SNgQ"
+quiz_finish_animation_id: "CgACAgQAAxkBAAIvXWgB7sL4A3iu1iqerMZBGHFt4caqAAKZBgACRrQsUxj1PrRzPgw8NgQ"
 quiz_finish_win_message: "Quiz solved by {user_full_name}"
 quiz_finish_fail_message: "No one solved this, fumo is going back to Gensoukyou"

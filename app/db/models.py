@@ -9,6 +9,7 @@ class Fumo(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, unique=True)
     file_id = Column(String, unique=True)
+    file_unique_id = Column(String, unique=True, nullable=True)
     source_link = Column(String, nullable=True)
     use_for_quiz = Column(Boolean, default=False)
 

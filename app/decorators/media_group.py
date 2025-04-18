@@ -17,7 +17,7 @@ async def _on_media_group_received(
     return await callback(messages, *args, **kwargs)
 
 
-def media_group_handler(
+def media_group_decorator(
     func: Optional[Callable] = None,
     only_album: bool = True,
     receive_timeout: float = 1.0,
