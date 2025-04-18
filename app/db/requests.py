@@ -22,9 +22,15 @@ class FumoCache:
         return cls._fumo_ids_cache
 
 
-async def db_add_fumo(session: AsyncSession, name: str, file_id: str, source_link: Optional[str]) -> str:
+async def db_add_fumo(
+    session: AsyncSession,
+    name: str,
+    file_id: str,
+    file_unique_id: str,
+    source_link: Optional[str],
+) -> str:
     try:
-        fumo = Fumo(name=name, file_id=file_id, source_link=source_link)
+        fumo = Fumo(name=name, file_id=file_id, file_unique_id=file_unique_id, source_link=source_link)
         session.add(fumo)
         await session.commit()
         return f"Fumo {name} added successfully."
@@ -85,11 +91,13 @@ async def db_update_fumo_name(session: AsyncSession, old_fumo_name: str, new_fum
         return f"Error occurred: {str(e)}"
 
 
-async def db_update_fumo_file_id_by_name(session: AsyncSession, fumo_name: str, new_fumo_file_id: str) -> str:
+async def db_update_fumo_file_id_by_name(
+    session: AsyncSession, fumo_name: str, new_fumo_file_id: str, new_file_unique_id: str
+) -> str:
     try:
         await session.execute(update(Fumo)
                               .where(Fumo.name == fumo_name)
-                              .values(file_id=new_fumo_file_id))
+                              .values(file_id=new_fumo_file_id, file_unique_id=new_file_unique_id))
         await session.commit()
         return f"{fumo_name} image updated."
     except SQLAlchemyError as e:

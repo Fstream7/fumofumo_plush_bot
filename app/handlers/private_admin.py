@@ -80,10 +80,11 @@ async def cmd_add_fumo(message: types.Message, state: FSMContext) -> None:
 async def add_fumo(message: Message, session: AsyncSession):
     fumo_name = message.caption
     fumo_file_id = message.photo[-1].file_id
+    fumo_unique_id = message.photo[-1].file_unique_id
     fumo_link = None
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
-    result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_link)
+    result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_unique_id, fumo_link)
     await message.reply(result)
     fumo = await db_get_fumo_by_name(session, fumo_name)
     await message.answer_photo(
@@ -214,8 +215,9 @@ async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMCon
     user_data = await state.get_data()
     fumo_name = user_data['fumo_to_edit']
     message_to_edit = user_data['message_to_edit']
-    new_fumo_file_id = message.photo[0].file_id
-    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id)
+    new_fumo_file_id = message.photo[-1].file_id
+    new_file_unique_id = message.photo[-1].file_unique_id
+    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id, new_file_unique_id)
     await message_to_edit.edit_media(
         media=input_media_photo.InputMediaPhoto(
             type="photo",
@@ -330,9 +332,20 @@ async def import_fumo_images(message: types.Message, command: CommandObject, ses
             fumo_photo = await message.answer_photo(FSInputFile(f"{path}/{fumo}"))
             fumo_name_exists_in_db = await db_get_fumo_by_name(session, fumo_name)
             if fumo_name_exists_in_db:
-                result = await db_update_fumo_file_id_by_name(session, fumo_name, fumo_photo.photo[-1].file_id)
+                result = await db_update_fumo_file_id_by_name(
+                    session,
+                    fumo_name,
+                    fumo_photo.photo[-1].file_id,
+                    fumo_photo.photo[-1].file_unique_id,
+                )
             else:
-                result = await db_add_fumo(session, fumo_name, fumo_photo.photo[-1].file_id, source_link=None)
+                result = await db_add_fumo(
+                    session,
+                    fumo_name,
+                    fumo_photo.photo[-1].file_id,
+                    fumo_photo.photo[-1].file_unique_id,
+                    source_link=None
+                )
             await message.reply(result)
         except Exception as e:
             await message.answer(f"Error occurred {str(e)}")
