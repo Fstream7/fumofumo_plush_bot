@@ -112,7 +112,7 @@ async def random_quiz_for_channel(messages: List[types.Message], session: AsyncS
     Randomly reply messages from linked channel with quiz
     Use media_group decorator to process albums as one message.
     """
-    if random() < 0.4:
+    if random() < 0.05:
         fumo = await db_get_random_fumo_for_quiz(session)
         if fumo:
             await quiz_end(state, user_name=None)

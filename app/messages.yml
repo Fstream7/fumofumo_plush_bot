@@ -104,6 +104,9 @@ blacklist_words:
   - nftshowroom.com
   - viv3.com
   - cargo.build
+  - doodis.world
+  - RoyalMoney.top
+  - fogwin.top
 
 quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your collection."
 quiz_success_message: |
