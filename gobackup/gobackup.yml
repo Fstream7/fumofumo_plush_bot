@@ -32,7 +32,8 @@ models:
       # At 12:00 on Sunday.
       cron: "0 12 * * sun"
     storages:
-      r2:
+      cloudflare_r2:
+        type: r2
         bucket: $BACKUP_CF_BUCKET
         path: /
         account_id: $BACKUP_CF_ACCOUNT_ID
