@@ -28,6 +28,12 @@ models:
         database: $POSTGRES_DB
         username: $POSTGRES_USER
         password: $POSTGRES_PASSWORD
+    notifiers:
+      telegram:
+        type: telegram
+        chat_id: $ADMIN_CHAT_ID
+        token: $TELEGRAM_BOT_TOKEN
+        on_success: false
   fumobot_weekly:
     schedule:
       # At 12:00 on Sunday.
