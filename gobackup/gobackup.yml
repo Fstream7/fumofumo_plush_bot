@@ -9,13 +9,14 @@ models:
       cloudflare_r2:
         type: r2
         bucket: $BACKUP_CF_BUCKET
-        path: /
+        path: daily/
         account_id: $BACKUP_CF_ACCOUNT_ID
         access_key_id: $BACKUP_CF_KEY_ID
         secret_access_key: $BACKUP_CF_KEY
+        keep: 90
       local:
         type: local
-        keep: 10
+        keep: 30
         path: /root/backups
     compress_with:
       type: tgz
@@ -35,10 +36,11 @@ models:
       cloudflare_r2:
         type: r2
         bucket: $BACKUP_CF_BUCKET
-        path: /
+        path: weekly/
         account_id: $BACKUP_CF_ACCOUNT_ID
         access_key_id: $BACKUP_CF_KEY_ID
         secret_access_key: $BACKUP_CF_KEY
+        keep: 3
     compress_with:
       type: tgz
     databases:
