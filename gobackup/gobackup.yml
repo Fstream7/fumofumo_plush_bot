@@ -6,7 +6,8 @@ models:
       # At 0:00 everyday.
       cron: "0 0 * * *"
     storages:
-      r2:
+      cloudflare_r2:
+        type: r2
         bucket: $BACKUP_CF_BUCKET
         path: /
         account_id: $BACKUP_CF_ACCOUNT_ID
