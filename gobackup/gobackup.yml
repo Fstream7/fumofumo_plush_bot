@@ -1,15 +1,42 @@
 web:
   host: 127.0.0.1
 models:
-  fumobot:
+  fumobot_db_daily:
     schedule:
-      # At 12:00 on Sunday.
-      cron: "0 12 * * sun"
+      # At 0:00 everyday.
+      cron: "0 0 * * *"
     storages:
+      r2:
+        bucket: $BACKUP_CF_BUCKET
+        path: /
+        account_id: $BACKUP_CF_ACCOUNT_ID
+        access_key_id: $BACKUP_CF_KEY_ID
+        secret_access_key: $BACKUP_CF_KEY
       local:
         type: local
         keep: 10
         path: /root/backups
+    compress_with:
+      type: tgz
+    databases:
+      fumobot_db:
+        type: postgresql
+        host: $POSTGRES_HOST
+        port: $POSTGRES_PORT
+        database: $POSTGRES_DB
+        username: $POSTGRES_USER
+        password: $POSTGRES_PASSWORD
+  fumobot_weekly:
+    schedule:
+      # At 12:00 on Sunday.
+      cron: "0 12 * * sun"
+    storages:
+      r2:
+        bucket: $BACKUP_CF_BUCKET
+        path: /
+        account_id: $BACKUP_CF_ACCOUNT_ID
+        access_key_id: $BACKUP_CF_KEY_ID
+        secret_access_key: $BACKUP_CF_KEY
     compress_with:
       type: tgz
     databases:
