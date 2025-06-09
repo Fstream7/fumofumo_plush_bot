@@ -14,7 +14,7 @@ router = Router()
 
 @router.message(Command("fumo"))
 async def cmd_fumo(message: types.Message) -> None:
-    await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ'])}")
+    await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ', 'ᗜ‸ᗜ'])}")
 
 
 @router.message(Command("fumofumo"))
