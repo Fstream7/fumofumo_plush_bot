@@ -10,6 +10,7 @@ async def set_commands(bot: Bot) -> None:
     admin_commands = [
         BotCommand(command='id', description='Get current chat id'),
         BotCommand(command='fumo', description='Get random fumo face ᗜᴗᗜ'),
+        BotCommand(command='sukusuku', description='Get random sukusuku face (´•w•`)'),
         BotCommand(command='fumofumo', description='Get Fumo of the day based on day and user id. '),
         BotCommand(command='get_media_id', description='Get media file_id'),
         BotCommand(command='add_fumo', description='Add fumos to database'),
@@ -21,11 +22,13 @@ async def set_commands(bot: Bot) -> None:
     ]
     private_chat_commands = [
         BotCommand(command='fumo', description='Get random fumo face ᗜᴗᗜ'),
+        BotCommand(command='sukusuku', description='Get random sukusuku face (´•w•`)'),
         BotCommand(command='fumofumo', description='Get Fumo of the day based on day and user id. '),
         BotCommand(command='privacy', description='Get privacy policy'),
     ]
     group_chat_commands = [
         BotCommand(command='fumo', description='Get random fumo face ᗜᴗᗜ'),
+        BotCommand(command='sukusuku', description='Get random sukusuku face (´•w•`)'),
         BotCommand(command='fumofumo', description='Get Fumo of the day based on day and user id. '),
     ]
     await bot.set_my_commands(admin_commands, BotCommandScopeChat(chat_id=Config.ADMIN_CHAT_ID))

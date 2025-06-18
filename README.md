@@ -82,6 +82,7 @@ docker compose -f docker-compose.yml up -d
 ### Commands:
  - `/id` will return current chat id
  - `/fumo` will return random fumo face ᗜᴗᗜ
+ - `/sukusuku` will return random sukusuku face (´•w•`)
  - `/fumofumo` will return fumo of the day based on day and user id. 
 ### Admin commands:
  - `/get_media_id` FSM, will return given media id

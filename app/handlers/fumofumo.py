@@ -17,6 +17,11 @@ async def cmd_fumo(message: types.Message) -> None:
     await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ', 'ᗜ‸ᗜ'])}")
 
 
+@router.message(Command("sukusuku"))
+async def cmd_sukusuku(message: types.Message) -> None:
+    await message.reply(f"{choice(['(´•w•`)', '(`•w•´)'])}")
+
+
 @router.message(Command("fumofumo"))
 async def cmd_fumofumo(message: types.Message, session: AsyncSession) -> None:
     converted_date = message.date.astimezone(timezone(Config.TIMEZONE))
