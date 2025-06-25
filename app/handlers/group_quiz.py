@@ -124,6 +124,9 @@ async def random_quiz_for_channel(messages: List[types.Message], session: AsyncS
 
 @router.message(QuizForm.quiz_fumo, F.text, QuizReplyFilter())
 async def cmd_quiz_guess(message: types.Message, session: AsyncSession, state: FSMContext) -> None:
+    """
+    Processing replies on quiz
+    """
     quiz_data = await state.get_data()
     fumo_name = quiz_data['fumo_name']
     quiz_message = quiz_data['quiz_message']
