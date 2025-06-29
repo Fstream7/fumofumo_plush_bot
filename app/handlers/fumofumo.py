@@ -14,7 +14,9 @@ router = Router()
 
 @router.message(Command("fumo"))
 async def cmd_fumo(message: types.Message) -> None:
-    await message.reply(f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ', 'ᗜ‸ᗜ'])}")
+    await message.reply(
+        f"Fumo {choice(['ᗜᴗᗜ', 'ᗜˬᗜ', 'ᗜ˰ᗜ', 'ᗜ‿ᗜ', 'ᗜ_ᗜ', 'ᗜωᗜ', 'ᗜ‸ᗜ', 'ᗜ⩊ᗜ', 'ᗜ⁔ᗜ'])}"
+    )
 
 
 @router.message(Command("sukusuku"))
@@ -26,16 +28,20 @@ async def cmd_sukusuku(message: types.Message) -> None:
 async def cmd_fumofumo(message: types.Message, session: AsyncSession) -> None:
     converted_date = message.date.astimezone(timezone(Config.TIMEZONE))
     fumo_string = f"{message.from_user.id}_{converted_date.strftime('%Y%m%d')}"
-    fumo_hash = hashlib.blake2b(fumo_string.encode(),
-                                digest_size=8,
-                                salt=str.encode(Config.HASH_SALT.get_secret_value())
-                                ).hexdigest()
+    fumo_hash = hashlib.blake2b(
+        fumo_string.encode(),
+        digest_size=8,
+        salt=str.encode(Config.HASH_SALT.get_secret_value()),
+    ).hexdigest()
     fumo_id = int(fumo_hash, 16)
     fumo = await db_get_fumo_by_id(session, fumo_id)
     if fumo:
         await message.reply_photo(
             photo=fumo.file_id,
-            caption=Messages.fumofumo_message.format(fumo=f"[{escape_markdown(fumo.name)}]({fumo.source_link})"),
-            parse_mode=ParseMode.MARKDOWN_V2)
+            caption=Messages.fumofumo_message.format(
+                fumo=f"[{escape_markdown(fumo.name)}]({fumo.source_link})"
+            ),
+            parse_mode=ParseMode.MARKDOWN_V2,
+        )
     else:
         await message.reply(Messages.fumofumo_message_not_found)
