@@ -10,7 +10,7 @@ class QuizFilter(BaseFilter):
     """
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
-        return message.chat.id in Messages.quiz_chats
+        return any(chat["id"] == message.chat.id for chat in Messages.quiz_chats)
 
 
 class QuizReplyFilter(BaseFilter):

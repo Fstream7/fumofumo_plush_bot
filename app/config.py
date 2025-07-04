@@ -10,6 +10,13 @@ with open(file_path, "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
 
 
+class QuizChat(BaseModel):
+    name: Optional[str] = ""
+    id: int
+    cron: Optional[str] = None
+    delay: Optional[int] = 0
+
+
 class Messages(BaseModel):
     welcome_message: str
     propose_command_message: str
@@ -27,7 +34,7 @@ class Messages(BaseModel):
     privacy: str
     blacklist_words: list[str]
     blacklist_ban_message: str
-    quiz_chats: list[float]
+    quiz_chats: list[QuizChat]
     quiz_guess_message: str
     quiz_success_message: str
     quiz_fail_message: str
@@ -49,7 +56,6 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: Optional[SecretStr] = None
     HASH_SALT: SecretStr = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
-    QUIZ_CHAT_ID: Optional[int] = None
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True)
 
     @model_validator(mode="after")
