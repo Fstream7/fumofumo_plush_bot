@@ -121,8 +121,8 @@ quiz_chats:
     delay: 3600
   - name: I wish I could change this group name
     id: -1001836358375
-    cron: "0 8,20 * * *"
-    delay: 36000
+    cron: "0 8 * * *"
+    delay: 86400
 quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your collection."
 quiz_success_message: |
   That's right, {fumo} has been added to your collection.
