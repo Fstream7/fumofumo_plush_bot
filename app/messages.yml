@@ -123,6 +123,10 @@ quiz_chats:
     id: -1001836358375
     cron: "0 8 * * *"
     delay: 86400
+  - name: Ni4kofoxArts
+    id: -1002687661671
+    cron: "0 */2 * * *"
+    delay: 3600
 quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your collection."
 quiz_success_message: |
   That's right, {fumo} has been added to your collection.
