@@ -1,7 +1,7 @@
 from typing import Optional
 from os import path
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator
+from pydantic import SecretStr, BaseModel, RedisDsn, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
@@ -54,6 +54,7 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
+    REDIS_URI: Optional[SecretStr] = None
     HASH_SALT: SecretStr = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True)
@@ -73,6 +74,15 @@ class Settings(BaseSettings):
                 )
             else:
                 self.DATABASE_URI = SecretStr("sqlite+aiosqlite:///db.sqlite")
+        return self
+
+    @model_validator(mode="after")
+    def validate_redis_uri(self) -> "Settings":
+        if self.REDIS_URI:
+            try:
+                RedisDsn(self.REDIS_URI.get_secret_value())
+            except Exception as e:
+                raise Exception("Invalid REDIS_URI") from e
         return self
 
 
