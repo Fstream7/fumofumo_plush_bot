@@ -10,3 +10,4 @@ sqlalchemy[asyncio]==2.0.44
 apscheduler==3.11.0
 tzdata==2025.2
 pytz==2025.2
+redis==7.4.0 # only need for redis
