@@ -2,7 +2,12 @@ import asyncio
 import logging
 from aiogram import Router, F, types, Bot
 from aiogram.filters import Command
-from aiogram.types import Message, input_media_animation, ReplyKeyboardRemove
+from aiogram.types import (
+    Message,
+    input_media_animation,
+    ReplyKeyboardRemove,
+    CallbackQuery,
+)
 from filters.chat_type import ChatTypeFilter
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -15,8 +20,7 @@ from db.requests import (
     db_get_random_quiz_names,
 )
 from config import Messages
-from keyboards.quiz_buttons import quiz_buttons
-from keyboards.stop import stop
+from keyboards.quiz_buttons import quiz_buttons, stop_button, continue_button
 
 router = Router()
 router.message.filter(ChatTypeFilter(chat_type=["private"]))
@@ -26,18 +30,61 @@ class Form(StatesGroup):
     quiz_is_active = State()
 
 
+async def quiz_clean_post(
+    bot: Bot, current_fumo_link: str, quiz_chat_id: str, quiz_message_id: str
+) -> None:
+    try:
+        await bot.edit_message_media(
+            media=input_media_animation.InputMediaAnimation(
+                type="animation",
+                media=Messages.quiz_finish_animation_id,
+                caption=current_fumo_link,
+            ),
+            chat_id=quiz_chat_id,
+            message_id=quiz_message_id,
+        )
+    except TelegramBadRequest as error:
+        logging.error(error)
+
+
+async def quiz_end(state: FSMContext, bot: Bot) -> None:
+    """
+    End quiz, show user score and clear state
+    """
+    quiz_data = await state.get_data()
+    quiz_score = quiz_data["quiz_score"]
+    quiz_chat_id = quiz_data["quiz_chat_id"]
+    quiz_message_id = quiz_data["quiz_message_id"]
+    current_fumo_link = quiz_data["current_fumo_link"]
+    await quiz_clean_post(bot, current_fumo_link, quiz_chat_id, quiz_message_id)
+    await state.clear()
+    await bot.send_message(
+        chat_id=quiz_chat_id,
+        text=Messages.quiz_finish_message.format(score=str(quiz_score)),
+        reply_markup=ReplyKeyboardRemove(),
+    )
+
+
 @router.message(Form.quiz_is_active, Command("stop"))
 @router.message(Form.quiz_is_active, F.text.casefold() == "stop")
 @router.callback_query(Form.quiz_is_active, F.data == "stop")
-async def stop_handler(message: Message, state: FSMContext) -> None:
+async def stop_handler(message: Message, state: FSMContext, bot: Bot) -> None:
     """
     Allow user to stop game
     """
-    current_state = await state.get_state()
-    if current_state is None:
-        return
-    await state.clear()
-    await message.answer("Stopped.", reply_markup=ReplyKeyboardRemove())
+    await quiz_end(state, bot)
+
+
+@router.message(Form.quiz_is_active, F.text.casefold() == "continue")
+@router.callback_query(Form.quiz_is_active, F.data == "continue")
+async def quiz_continue(
+    message: Message, state: FSMContext, session: AsyncSession, bot: Bot
+) -> None:
+    """
+    Continue game after long response, to awoid flood when user not active
+    """
+    await message.reply("Continuing", reply_markup=stop_button())
+    await iterate_quiz(state, session, bot)
 
 
 @router.message(Command("quiz"))
@@ -59,7 +106,7 @@ async def private_quiz_start(
         "Guess a plushies characters name game.\n"
         "You will have only 10 second to choose correct answer\n"
         "Send /stop to stop game",
-        reply_markup=stop(),
+        reply_markup=stop_button(),
     )
     await bot.send_chat_action(chat_id=message.chat.id, action="typing")
     await asyncio.sleep(2)
@@ -94,8 +141,9 @@ async def private_quiz_post(state: FSMContext, session: AsyncSession, bot: Bot) 
             current_data = await state.get_data()
             new_fumo_name = current_data.get("current_fumo_name")
             if new_fumo_name == fumo.name:
-                await quiz_message.reply(Messages.quiz_timeout_message)
-                await iterate_quiz(state, session, bot)
+                await quiz_message.reply(
+                    Messages.quiz_timeout_message, reply_markup=continue_button()
+                )
     else:
         await bot.send_message(
             chat_id=quiz_chat_id, text=Messages.fumofumo_message_not_found
@@ -109,23 +157,12 @@ async def iterate_quiz(state: FSMContext, session: AsyncSession, bot: Bot) -> No
     If last fumo, clear state and send score
     """
     quiz_data = await state.get_data()
-    fumo_id_list = quiz_data["fumo_id_list"]
     quiz_chat_id = quiz_data["quiz_chat_id"]
     quiz_message_id = quiz_data["quiz_message_id"]
     current_fumo_link = quiz_data["current_fumo_link"]
-    try:
-        await bot.edit_message_media(
-            media=input_media_animation.InputMediaAnimation(
-                type="animation",
-                media=Messages.quiz_finish_animation_id,
-                caption=current_fumo_link,
-            ),
-            chat_id=quiz_chat_id,
-            message_id=quiz_message_id,
-        )
-    except TelegramBadRequest as error:
-        logging.error(error)
+    await quiz_clean_post(bot, current_fumo_link, quiz_chat_id, quiz_message_id)
     curent_position = quiz_data["curent_position"]
+    fumo_id_list = quiz_data["fumo_id_list"]
     if curent_position < (len(fumo_id_list) - 1):
         curent_position += 1
         await state.update_data(curent_position=curent_position)
@@ -133,18 +170,12 @@ async def iterate_quiz(state: FSMContext, session: AsyncSession, bot: Bot) -> No
         await asyncio.sleep(0.5)
         await private_quiz_post(state, session, bot)
     else:
-        quiz_score = quiz_data["quiz_score"]
-        await state.clear()
-        await bot.send_message(
-            chat_id=quiz_chat_id,
-            text=Messages.quiz_finish_message.format(score=str(quiz_score)),
-            reply_markup=ReplyKeyboardRemove(),
-        )
+        await quiz_end(session, bot)
 
 
 @router.callback_query(Form.quiz_is_active)
 async def process_quiz_answers(
-    callback: types.CallbackQuery, session: AsyncSession, state: FSMContext, bot: Bot
+    callback: CallbackQuery, session: AsyncSession, state: FSMContext, bot: Bot
 ):
     """
     Process quiz answers, triger next quiz

@@ -1,5 +1,5 @@
-from aiogram.types import InlineKeyboardMarkup
-from aiogram.utils.keyboard import InlineKeyboardBuilder
+from aiogram.types import InlineKeyboardMarkup, ReplyKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 
 
 def quiz_buttons(fumos_list: list[str]) -> InlineKeyboardMarkup:
@@ -8,3 +8,15 @@ def quiz_buttons(fumos_list: list[str]) -> InlineKeyboardMarkup:
         keyboard.button(text=fumo_name, callback_data=fumo_name)
     keyboard.adjust(2)
     return keyboard.as_markup()
+
+
+def stop_button() -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text="Stop", callback_data="stop")
+    return keyboard.as_markup(resize_keyboard=True)
+
+
+def continue_button() -> ReplyKeyboardMarkup:
+    keyboard = ReplyKeyboardBuilder()
+    keyboard.button(text="Continue", callback_data="continue")
+    return keyboard.as_markup(resize_keyboard=True)
