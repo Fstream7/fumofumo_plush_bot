@@ -31,6 +31,8 @@ Silly telegram bot.
 - `POSTGRES_DB` postgress db name
 - `POSTGRES_USER` postgress db user
 - `POSTGRES_PASSWORD` postgress db password
+### redis uri (if not provided, memory storage will be used):
+- `REDIS_URI` redis uri
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_media_id command from admin. 

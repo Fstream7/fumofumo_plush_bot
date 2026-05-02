@@ -8,8 +8,6 @@ from config import Config
 from middlewares import DbSessionMiddleware
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisStorage
 from aiogram.fsm.strategy import FSMStrategy
 
 
@@ -28,11 +26,13 @@ async def main() -> None:
     bot = Bot(token=Config.TELEGRAM_BOT_TOKEN.get_secret_value())
     if Config.REDIS_URI:
         logging.info("Using redis storage for states.")
+        from aiogram.fsm.storage.redis import RedisStorage
         storage = RedisStorage.from_url(Config.REDIS_URI.get_secret_value())
     else:
         logging.warning(
             "Using memory storage for states, states will be lost after app restart!"
         )
+        from aiogram.fsm.storage.memory import MemoryStorage
         storage = MemoryStorage()
     dp = Dispatcher(storage=storage, fsm_strategy=FSMStrategy.CHAT)
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
