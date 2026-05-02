@@ -268,7 +268,7 @@ async def db_get_random_quiz_names(
         select(Fumo.name)
         .where(Fumo.name != correct_name, Fumo.use_for_quiz)
         .order_by(func.random())
-        .limit(3)
+        .limit(5)
     )
     return result.scalars().all()
 

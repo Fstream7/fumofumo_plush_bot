@@ -113,7 +113,7 @@ async def private_quiz_start(
     await state.update_data(quiz_user_id=message.from_user.id)
     await message.answer(
         "Guess a plushies characters name game.\n"
-        "You will have only 10 second to choose correct answer\n"
+        "You will have only 30 second to choose correct answer\n"
         "Send /stop to stop game",
         reply_markup=stop_button(),
     )
@@ -125,7 +125,7 @@ async def private_quiz_start(
 async def private_quiz_post(state: FSMContext, session: AsyncSession, bot: Bot) -> None:
     """
     Post quiz fumo
-    Get fumo from db with current position and add it to list with 3 more names
+    Get fumo from db with current position and add it to list with 5 more names
     """
     quiz_data = await state.get_data()
     fumo_id_list = quiz_data["fumo_id_list"]
@@ -144,7 +144,7 @@ async def private_quiz_post(state: FSMContext, session: AsyncSession, bot: Bot) 
             reply_markup=quiz_buttons(fumos_list=fumo_names),
         )
         await state.update_data(quiz_message_id=quiz_message.message_id)
-        await asyncio.sleep(10)
+        await asyncio.sleep(30)
         current_state = await state.get_state()
         if current_state == Form.quiz_is_active:
             current_data = await state.get_data()
@@ -153,6 +153,7 @@ async def private_quiz_post(state: FSMContext, session: AsyncSession, bot: Bot) 
                 await quiz_message.reply(
                     Messages.quiz_timeout_message, reply_markup=continue_button()
                 )
+                await quiz_clean_post(bot, fumo.source_link, quiz_chat_id, quiz_message.message_id)
     else:
         await bot.send_message(
             chat_id=quiz_chat_id, text=Messages.fumofumo_message_not_found
