@@ -69,6 +69,10 @@ privacy: |
     When participating in the quiz, your name and user_id will be saved in db for leaderboard. 
     Only members of the same group can see it.
     You can contact the bot administrator to delete this data.
+  4. /quiz command:
+    When participating in the quiz game, your name, user_id and record will be saved in db for leaderboard.
+    Everyone can see it.
+    You can contact the bot administrator to delete this data.
 
   Contact
   If you have any questions or concerns about this privacy policy, please contact the bot owner directly using this bot.
@@ -133,7 +137,7 @@ quiz_success_message: |
   Use /my_fumos to see your fumos collection.
 quiz_pass_message: "Correct!"
 quiz_fail_message: "Wrong."
-quiz_timeout_message: "Too slow."
+quiz_timeout_message: "Too slow, press continue to continue gamedown_revision"
 quiz_finish_message: "Game finished, your score - {score}"
 quiz_no_fumos_in_collection_message: "You dont have any fumos in your collection yet"
 quiz_finish_animation_id: "CgACAgQAAxkBAAIvXWgB7sL4A3iu1iqerMZBGHFt4caqAAKZBgACRrQsUxj1PrRzPgw8NgQ"

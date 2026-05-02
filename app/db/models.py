@@ -13,7 +13,9 @@ class Fumo(Base):
     source_link = Column(String, nullable=True)
     use_for_quiz = Column(Boolean, default=False)
 
-    quiz_results = relationship("QuizResults", back_populates="fumo", cascade="all, delete")
+    quiz_results = relationship(
+        "QuizResults", back_populates="fumo", cascade="all, delete"
+    )
 
 
 class QuizUsers(Base):
@@ -22,7 +24,12 @@ class QuizUsers(Base):
     user_id = Column(BigInteger, primary_key=True)
     user_name = Column(String, nullable=True)
 
-    quiz_results = relationship("QuizResults", back_populates="quiz_user", cascade="all, delete")
+    quiz_results = relationship(
+        "QuizResults", back_populates="quiz_user", cascade="all, delete"
+    )
+    quiz_leaderboard = relationship(
+        "QuizLeaderBoard", back_populates="quiz_user", cascade="all, delete"
+    )
 
 
 class QuizResults(Base):
@@ -36,3 +43,13 @@ class QuizResults(Base):
 
     fumo = relationship("Fumo", back_populates="quiz_results")
     quiz_user = relationship("QuizUsers", back_populates="quiz_results")
+
+
+class QuizLeaderBoard(Base):
+    __tablename__ = "quiz_leaderboard"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(BigInteger, ForeignKey("quiz_users.user_id", ondelete="CASCADE"))
+    record = Column(Integer, default=0)
+
+    quiz_user = relationship("QuizUsers", back_populates="quiz_leaderboard")

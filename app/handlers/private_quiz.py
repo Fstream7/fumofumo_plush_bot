@@ -18,6 +18,8 @@ from db.requests import (
     db_get_quiz_fumo_ids,
     db_get_quiz_fumo_by_id,
     db_get_random_quiz_names,
+    db_update_leaderboard,
+    db_quiz_get_globabl_leaderboard,
 )
 from config import Messages
 from keyboards.quiz_buttons import quiz_buttons, stop_button, continue_button
@@ -47,7 +49,7 @@ async def quiz_clean_post(
         logging.error(error)
 
 
-async def quiz_end(state: FSMContext, bot: Bot) -> None:
+async def quiz_end(state: FSMContext, session: AsyncSession, bot: Bot) -> None:
     """
     End quiz, show user score and clear state
     """
@@ -56,8 +58,12 @@ async def quiz_end(state: FSMContext, bot: Bot) -> None:
     quiz_chat_id = quiz_data["quiz_chat_id"]
     quiz_message_id = quiz_data["quiz_message_id"]
     current_fumo_link = quiz_data["current_fumo_link"]
+    quiz_username = quiz_data["quiz_username"]
+    quiz_user_id = quiz_data["quiz_user_id"]
     await quiz_clean_post(bot, current_fumo_link, quiz_chat_id, quiz_message_id)
     await state.clear()
+    if quiz_score > 0:
+        await db_update_leaderboard(session, quiz_username, quiz_user_id, quiz_score)
     await bot.send_message(
         chat_id=quiz_chat_id,
         text=Messages.quiz_finish_message.format(score=str(quiz_score)),
@@ -68,11 +74,13 @@ async def quiz_end(state: FSMContext, bot: Bot) -> None:
 @router.message(Form.quiz_is_active, Command("stop"))
 @router.message(Form.quiz_is_active, F.text.casefold() == "stop")
 @router.callback_query(Form.quiz_is_active, F.data == "stop")
-async def stop_handler(message: Message, state: FSMContext, bot: Bot) -> None:
+async def stop_handler(
+    message: Message, state: FSMContext, session: AsyncSession, bot: Bot
+) -> None:
     """
     Allow user to stop game
     """
-    await quiz_end(state, bot)
+    await quiz_end(state, session, bot)
 
 
 @router.message(Form.quiz_is_active, F.text.casefold() == "continue")
@@ -102,6 +110,7 @@ async def private_quiz_start(
     await state.update_data(quiz_chat_id=message.chat.id)
     await state.update_data(quiz_score=0)
     await state.update_data(quiz_username=message.from_user.full_name)
+    await state.update_data(quiz_user_id=message.from_user.id)
     await message.answer(
         "Guess a plushies characters name game.\n"
         "You will have only 10 second to choose correct answer\n"
@@ -170,7 +179,7 @@ async def iterate_quiz(state: FSMContext, session: AsyncSession, bot: Bot) -> No
         await asyncio.sleep(0.5)
         await private_quiz_post(state, session, bot)
     else:
-        await quiz_end(session, bot)
+        await quiz_end(state, session, bot)
 
 
 @router.callback_query(Form.quiz_is_active)
@@ -192,3 +201,14 @@ async def process_quiz_answers(
         await callback.message.reply(Messages.quiz_fail_message)
     await callback.answer()
     await iterate_quiz(state, session, bot)
+
+
+@router.message(Command("leaderboard"))
+async def cmd_leaderboard(message: types.Message, session: AsyncSession) -> None:
+    result = await db_quiz_get_globabl_leaderboard(session)
+    if len(result) > 0:
+        fumo_names_text = "Users by record: \n"
+        fumo_names_text += "\n".join(
+            [f"{row.user_name} - {str(row.record)}" for row in result]
+        )
+        await message.reply(fumo_names_text)

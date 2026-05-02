@@ -2,7 +2,7 @@ from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy import select, delete, update, desc, func
-from .models import Fumo, QuizUsers, QuizResults
+from .models import Fumo, QuizUsers, QuizResults, QuizLeaderBoard
 
 
 class FumoCache:
@@ -164,13 +164,11 @@ async def db_get_random_fumo_for_quiz(session: AsyncSession) -> Optional[Fumo]:
     return result.scalar_one_or_none()
 
 
-async def db_quiz_add_entry(
-    session: AsyncSession, user_id: float, user_name: str, fumo_id: int, group_id: float
-) -> str:
+async def db_add_or_update_quiz_user(
+    session: AsyncSession, user_id: str, user_name: str
+) -> None:
     """
     Create user if not exist. Update name if changed
-    If user_id, fumo_id and group_id exist in QuizResults - increase fumo_count for it.
-    If QuizResults record not exist - create new one.
     """
     quiz_user_result = await session.execute(
         select(QuizUsers).where(QuizUsers.user_id == user_id)
@@ -182,6 +180,17 @@ async def db_quiz_add_entry(
     else:
         quiz_user = QuizUsers(user_id=user_id, user_name=user_name)
         session.add(quiz_user)
+    await session.commit()
+
+
+async def db_quiz_add_entry(
+    session: AsyncSession, user_id: float, user_name: str, fumo_id: int, group_id: float
+) -> str:
+    """
+    If user_id, fumo_id and group_id exist in QuizResults - increase fumo_count for it.
+    If QuizResults record not exist - create new one.
+    """
+    await db_add_or_update_quiz_user(session, user_id, user_name)
     quiz_entry_result = await session.execute(
         select(QuizResults).where(
             QuizResults.user_id == user_id,
@@ -262,3 +271,37 @@ async def db_get_random_quiz_names(
         .limit(3)
     )
     return result.scalars().all()
+
+
+async def db_update_leaderboard(
+    session: AsyncSession, quiz_username: str, quiz_user_id: str, quiz_score: int
+) -> None:
+    """
+    If user got bigger score - update it
+    """
+    await db_add_or_update_quiz_user(session, quiz_user_id, quiz_username)
+    quiz_entry_result = await session.execute(
+        select(QuizLeaderBoard).where(QuizLeaderBoard.user_id == quiz_user_id)
+    )
+    quiz_entry = quiz_entry_result.scalar_one_or_none()
+    if quiz_entry:
+        if quiz_entry.record < quiz_score:
+            quiz_entry.record = quiz_score
+    else:
+        quiz_entry = QuizLeaderBoard(user_id=quiz_user_id, record=quiz_score)
+        session.add(quiz_entry)
+    await session.commit()
+
+
+async def db_quiz_get_globabl_leaderboard(session: AsyncSession) -> list[str]:
+    result = await session.execute(
+        select(
+            QuizUsers.user_id,
+            QuizUsers.user_name,
+            QuizLeaderBoard.record,
+        )
+        .select_from(QuizLeaderBoard)
+        .join(QuizUsers, QuizLeaderBoard.user_id == QuizUsers.user_id)
+        .order_by(desc("record"))
+    )
+    return result.all()

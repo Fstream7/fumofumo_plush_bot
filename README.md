@@ -86,6 +86,7 @@ docker compose -f docker-compose.yml up -d
  - `/sukusuku` will return random sukusuku face (´•w•`)
  - `/fumofumo` will return fumo of the day based on day and user id. 
  - `/quiz` quiz game 
+ - `/leaderboard` leaderboard by quiz
 ### Admin commands:
  - `/get_media_id` FSM, will return given media id
  - `/add_fumo` FSM for adding fumos to db
