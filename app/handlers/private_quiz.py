@@ -80,7 +80,6 @@ async def private_quiz_post(state: FSMContext, session: AsyncSession, bot: Bot) 
         quiz_message = await bot.send_photo(
             chat_id=quiz_chat_id,
             photo=fumo.file_id,
-            caption=Messages.quiz_guess_message,
             reply_markup=quiz_buttons(fumos_list=fumo_names),
         )
         await state.update_data(quiz_message_id=quiz_message.message_id)
