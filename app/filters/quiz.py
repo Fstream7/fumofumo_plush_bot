@@ -4,7 +4,7 @@ from aiogram import Bot
 from config import Messages
 
 
-class QuizFilter(BaseFilter):
+class GroupQuizFilter(BaseFilter):
     """
     Limit quiz commands with quiz group
     """

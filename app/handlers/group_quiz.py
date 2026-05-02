@@ -15,13 +15,13 @@ from db.requests import db_get_random_fumo_for_quiz
 from db.requests import db_quiz_add_entry, db_quiz_get_records_for_user_id
 from db.requests import db_quiz_get_leaderboard
 from sqlalchemy.ext.asyncio import AsyncSession
-from filters.quiz import QuizFilter, QuizReplyFilter
+from filters.quiz import GroupQuizFilter, QuizReplyFilter
 from filters.message_from_channel import MessageFromChannelFilter
 from utils.escape_for_markdown import escape_markdown
 from decorators.media_group import media_group_decorator
 
 router = Router()
-router.message.filter((QuizFilter()))
+router.message.filter((GroupQuizFilter()))
 
 
 class QuizForm(StatesGroup):
