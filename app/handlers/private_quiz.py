@@ -1,10 +1,12 @@
 import asyncio
+import logging
 from aiogram import Router, F, types, Bot
 from aiogram.filters import Command
-from aiogram.types import Message, input_media_animation
+from aiogram.types import Message, input_media_animation, ReplyKeyboardRemove
 from filters.chat_type import ChatTypeFilter
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
+from aiogram.exceptions import TelegramBadRequest
 from sqlalchemy.ext.asyncio import AsyncSession
 from random import shuffle
 from db.requests import (
@@ -14,6 +16,7 @@ from db.requests import (
 )
 from config import Messages
 from keyboards.quiz_buttons import quiz_buttons
+from keyboards.stop import stop
 
 router = Router()
 router.message.filter(ChatTypeFilter(chat_type=["private"]))
@@ -25,6 +28,7 @@ class Form(StatesGroup):
 
 @router.message(Form.quiz_is_active, Command("stop"))
 @router.message(Form.quiz_is_active, F.text.casefold() == "stop")
+@router.callback_query(Form.quiz_is_active, F.data == "stop")
 async def stop_handler(message: Message, state: FSMContext) -> None:
     """
     Allow user to stop game
@@ -33,7 +37,7 @@ async def stop_handler(message: Message, state: FSMContext) -> None:
     if current_state is None:
         return
     await state.clear()
-    await message.answer("Stopped.")
+    await message.answer("Stopped.", reply_markup=ReplyKeyboardRemove())
 
 
 @router.message(Command("quiz"))
@@ -54,7 +58,8 @@ async def private_quiz_start(
     await message.answer(
         "Guess a plushies characters name game.\n"
         "You will have only 10 second to choose correct answer\n"
-        "Send /stop to stop game"
+        "Send /stop to stop game",
+        reply_markup=stop(),
     )
     await bot.send_chat_action(chat_id=message.chat.id, action="typing")
     await asyncio.sleep(2)
@@ -108,15 +113,18 @@ async def iterate_quiz(state: FSMContext, session: AsyncSession, bot: Bot) -> No
     quiz_chat_id = quiz_data["quiz_chat_id"]
     quiz_message_id = quiz_data["quiz_message_id"]
     current_fumo_link = quiz_data["current_fumo_link"]
-    await bot.edit_message_media(
-        media=input_media_animation.InputMediaAnimation(
-            type="animation",
-            media=Messages.quiz_finish_animation_id,
-            caption=current_fumo_link,
-        ),
-        chat_id=quiz_chat_id,
-        message_id=quiz_message_id,
-    )
+    try:
+        await bot.edit_message_media(
+            media=input_media_animation.InputMediaAnimation(
+                type="animation",
+                media=Messages.quiz_finish_animation_id,
+                caption=current_fumo_link,
+            ),
+            chat_id=quiz_chat_id,
+            message_id=quiz_message_id,
+        )
+    except TelegramBadRequest as error:
+        logging.error(error)
     curent_position = quiz_data["curent_position"]
     if curent_position < (len(fumo_id_list) - 1):
         curent_position += 1
@@ -130,6 +138,7 @@ async def iterate_quiz(state: FSMContext, session: AsyncSession, bot: Bot) -> No
         await bot.send_message(
             chat_id=quiz_chat_id,
             text=Messages.quiz_finish_message.format(score=str(quiz_score)),
+            reply_markup=ReplyKeyboardRemove(),
         )
 
 
