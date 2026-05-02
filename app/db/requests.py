@@ -7,6 +7,7 @@ from .models import Fumo, QuizUsers, QuizResults
 
 class FumoCache:
     """Keep fumo db ids in cache. So if db updated - user still can get same fumo."""
+
     _fumo_ids_cache: Optional[list[int]] = None
 
     @classmethod
@@ -30,7 +31,12 @@ async def db_add_fumo(
     source_link: Optional[str],
 ) -> str:
     try:
-        fumo = Fumo(name=name, file_id=file_id, file_unique_id=file_unique_id, source_link=source_link)
+        fumo = Fumo(
+            name=name,
+            file_id=file_id,
+            file_unique_id=file_unique_id,
+            source_link=source_link,
+        )
         session.add(fumo)
         await session.commit()
         return f"Fumo {name} added successfully."
@@ -45,11 +51,11 @@ async def db_get_fumo_by_id(session: AsyncSession, fumo_id: int) -> Fumo:
         return None
     fumo_list_id = fumo_ids_cache[fumo_id % len(fumo_ids_cache)]
     result = await session.execute(
-        select(Fumo.name,
-               Fumo.file_id,
-               Fumo.source_link,
-               )
-        .where(Fumo.id == fumo_list_id)
+        select(
+            Fumo.name,
+            Fumo.file_id,
+            Fumo.source_link,
+        ).where(Fumo.id == fumo_list_id)
     )
     return result.one_or_none()
 
@@ -59,8 +65,12 @@ async def db_show_all_fumos(session: AsyncSession) -> list[Fumo]:
     return result.scalars().all()
 
 
-async def db_search_fumos_by_name(session: AsyncSession, search_pattern: str) -> Optional[list[Fumo]]:
-    result = await session.execute(select(Fumo).where(Fumo.name.like(f'%{search_pattern}%')))
+async def db_search_fumos_by_name(
+    session: AsyncSession, search_pattern: str
+) -> Optional[list[Fumo]]:
+    result = await session.execute(
+        select(Fumo).where(Fumo.name.like(f"%{search_pattern}%"))
+    )
     return result.scalars().all()
 
 
@@ -79,11 +89,13 @@ async def db_delete_fumo_by_name(session: AsyncSession, fumo_name: str) -> str:
         return f"Error occurred: {str(e)}"
 
 
-async def db_update_fumo_name(session: AsyncSession, old_fumo_name: str, new_fumo_name: str) -> str:
+async def db_update_fumo_name(
+    session: AsyncSession, old_fumo_name: str, new_fumo_name: str
+) -> str:
     try:
-        await session.execute(update(Fumo).
-                              where(Fumo.name == old_fumo_name)
-                              .values(name=new_fumo_name))
+        await session.execute(
+            update(Fumo).where(Fumo.name == old_fumo_name).values(name=new_fumo_name)
+        )
         await session.commit()
         return f"{new_fumo_name} name updated."
     except SQLAlchemyError as e:
@@ -92,12 +104,17 @@ async def db_update_fumo_name(session: AsyncSession, old_fumo_name: str, new_fum
 
 
 async def db_update_fumo_file_id_by_name(
-    session: AsyncSession, fumo_name: str, new_fumo_file_id: str, new_file_unique_id: str
+    session: AsyncSession,
+    fumo_name: str,
+    new_fumo_file_id: str,
+    new_file_unique_id: str,
 ) -> str:
     try:
-        await session.execute(update(Fumo)
-                              .where(Fumo.name == fumo_name)
-                              .values(file_id=new_fumo_file_id, file_unique_id=new_file_unique_id))
+        await session.execute(
+            update(Fumo)
+            .where(Fumo.name == fumo_name)
+            .values(file_id=new_fumo_file_id, file_unique_id=new_file_unique_id)
+        )
         await session.commit()
         return f"{fumo_name} image updated."
     except SQLAlchemyError as e:
@@ -105,11 +122,15 @@ async def db_update_fumo_file_id_by_name(
         return f"Error occurred: {str(e)}"
 
 
-async def db_update_fumo_source_link_by_name(session: AsyncSession, fumo_name: str, new_source_link: str) -> str:
+async def db_update_fumo_source_link_by_name(
+    session: AsyncSession, fumo_name: str, new_source_link: str
+) -> str:
     try:
-        await session.execute(update(Fumo)
-                              .where(Fumo.name == fumo_name)
-                              .values(source_link=new_source_link))
+        await session.execute(
+            update(Fumo)
+            .where(Fumo.name == fumo_name)
+            .values(source_link=new_source_link)
+        )
         await session.commit()
         return f"{fumo_name} url updated."
     except SQLAlchemyError as e:
@@ -117,11 +138,15 @@ async def db_update_fumo_source_link_by_name(session: AsyncSession, fumo_name: s
         return f"Error occurred: {str(e)}"
 
 
-async def db_update_fumo_quiz_by_name(session: AsyncSession, fumo_name: str, new_use_for_quiz: bool) -> str:
+async def db_update_fumo_quiz_by_name(
+    session: AsyncSession, fumo_name: str, new_use_for_quiz: bool
+) -> str:
     try:
-        await session.execute(update(Fumo)
-                              .where(Fumo.name == fumo_name)
-                              .values(use_for_quiz=new_use_for_quiz))
+        await session.execute(
+            update(Fumo)
+            .where(Fumo.name == fumo_name)
+            .values(use_for_quiz=new_use_for_quiz)
+        )
         await session.commit()
         return f"{fumo_name} quiz status updated."
     except SQLAlchemyError as e:
@@ -130,27 +155,26 @@ async def db_update_fumo_quiz_by_name(session: AsyncSession, fumo_name: str, new
 
 
 async def db_get_random_fumo_for_quiz(session: AsyncSession) -> Optional[Fumo]:
-    result = await session.execute(select(Fumo)
-                                   .where(Fumo.use_for_quiz)
-                                   .order_by(func.random())  # pylint: disable=not-callable
-                                   .limit(1))
+    result = await session.execute(
+        select(Fumo)
+        .where(Fumo.use_for_quiz)
+        .order_by(func.random())  # pylint: disable=not-callable
+        .limit(1)
+    )
     return result.scalar_one_or_none()
 
 
 async def db_quiz_add_entry(
-        session: AsyncSession,
-        user_id: float,
-        user_name: str,
-        fumo_id: int,
-        group_id: float
+    session: AsyncSession, user_id: float, user_name: str, fumo_id: int, group_id: float
 ) -> str:
     """
     Create user if not exist. Update name if changed
     If user_id, fumo_id and group_id exist in QuizResults - increase fumo_count for it.
     If QuizResults record not exist - create new one.
     """
-    quiz_user_result = await session.execute(select(QuizUsers)
-                                             .where(QuizUsers.user_id == user_id))
+    quiz_user_result = await session.execute(
+        select(QuizUsers).where(QuizUsers.user_id == user_id)
+    )
     quiz_user = quiz_user_result.scalar_one_or_none()
     if quiz_user:
         if user_name != quiz_user.user_name:
@@ -158,17 +182,20 @@ async def db_quiz_add_entry(
     else:
         quiz_user = QuizUsers(user_id=user_id, user_name=user_name)
         session.add(quiz_user)
-    quiz_entry_result = await session.execute(select(QuizResults)
-                                              .where(
-        QuizResults.user_id == user_id,
-        QuizResults.fumo_id == fumo_id,
-        QuizResults.group_id == group_id
-    ))
+    quiz_entry_result = await session.execute(
+        select(QuizResults).where(
+            QuizResults.user_id == user_id,
+            QuizResults.fumo_id == fumo_id,
+            QuizResults.group_id == group_id,
+        )
+    )
     quiz_entry = quiz_entry_result.scalar_one_or_none()
     if quiz_entry:
         quiz_entry.fumo_count += 1
     else:
-        quiz_entry = QuizResults(user_id=user_id, fumo_id=fumo_id, fumo_count=1, group_id=group_id)
+        quiz_entry = QuizResults(
+            user_id=user_id, fumo_id=fumo_id, fumo_count=1, group_id=group_id
+        )
         session.add(quiz_entry)
     try:
         await session.commit()
@@ -177,12 +204,14 @@ async def db_quiz_add_entry(
         return f"Error occurred: {str(e)}"
 
 
-async def db_quiz_get_records_for_user_id(session: AsyncSession, user_id: float, group_id: float) -> str:
+async def db_quiz_get_records_for_user_id(
+    session: AsyncSession, user_id: float, group_id: float
+) -> str:
     result = await session.execute(
         select(
             Fumo.name.label("fumo_name"),
             Fumo.source_link.label("fumo_link"),
-            QuizResults.fumo_count
+            QuizResults.fumo_count,
         )
         .join(QuizResults, Fumo.id == QuizResults.fumo_id)
         .where(QuizResults.user_id == user_id, QuizResults.group_id == group_id)
@@ -196,7 +225,7 @@ async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> lis
         select(
             QuizUsers.user_id,
             QuizUsers.user_name,
-            func.sum(QuizResults.fumo_count).label("fumo_count")
+            func.sum(QuizResults.fumo_count).label("fumo_count"),
         )
         .join(QuizUsers, QuizResults.user_id == QuizUsers.user_id)
         .where(QuizResults.group_id == group_id)
