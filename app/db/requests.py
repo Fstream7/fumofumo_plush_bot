@@ -234,3 +234,31 @@ async def db_quiz_get_leaderboard(session: AsyncSession, group_id: float) -> lis
         .limit(10)
     )
     return result.all()
+
+
+async def db_get_quiz_fumo_ids(session: AsyncSession) -> list[int]:
+    result = await session.execute(select(Fumo.id).where(Fumo.use_for_quiz))
+    return result.scalars().all()
+
+
+async def db_get_quiz_fumo_by_id(session: AsyncSession, fumo_id: int) -> Fumo:
+    result = await session.execute(
+        select(
+            Fumo.name,
+            Fumo.file_id,
+            Fumo.source_link,
+        ).where(Fumo.id == fumo_id)
+    )
+    return result.one_or_none()
+
+
+async def db_get_random_quiz_names(
+    session: AsyncSession, correct_name: str
+) -> list[str]:
+    result = await session.execute(
+        select(Fumo.name)
+        .where(Fumo.name != correct_name, Fumo.use_for_quiz)
+        .order_by(func.random())
+        .limit(3)
+    )
+    return result.scalars().all()

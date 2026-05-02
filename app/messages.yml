@@ -131,7 +131,10 @@ quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your co
 quiz_success_message: |
   That's right, {fumo} has been added to your collection.
   Use /my_fumos to see your fumos collection.
+quiz_pass_message: "Correct!"
 quiz_fail_message: "Wrong."
+quiz_timeout_message: "Timeout"
+quiz_finish_message: "Game finished, your score - {score}"
 quiz_no_fumos_in_collection_message: "You dont have any fumos in your collection yet"
 quiz_finish_animation_id: "CgACAgQAAxkBAAIvXWgB7sL4A3iu1iqerMZBGHFt4caqAAKZBgACRrQsUxj1PrRzPgw8NgQ"
 quiz_finish_win_message: "Quiz solved by {user_full_name}"
