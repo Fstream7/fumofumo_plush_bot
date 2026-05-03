@@ -1,13 +1,29 @@
 from typing import Optional
 from os import path
 import yaml
-from pydantic import SecretStr, BaseModel, model_validator
+from pydantic import SecretStr, BaseModel, RedisDsn, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic_extra_types.timezone_name import TimeZoneName
 
 file_path = path.join(path.dirname(__file__), "messages.yml")
 with open(file_path, "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
+
+
+file_path = path.join(path.dirname(__file__), "quiz_chats.yml")
+with open(file_path, "r", encoding="utf-8") as stream1:
+    quiz_chats_kwargs = yaml.safe_load(stream1)
+
+
+class QuizChat(BaseModel):
+    name: Optional[str] = ""
+    id: int
+    cron: Optional[str] = None
+    delay: Optional[int] = 0
+
+
+class QuizChats(BaseModel):
+    quiz_chats: list[Optional[QuizChat]] = []
 
 
 class Messages(BaseModel):
@@ -27,10 +43,12 @@ class Messages(BaseModel):
     privacy: str
     blacklist_words: list[str]
     blacklist_ban_message: str
-    quiz_chats: list[float]
     quiz_guess_message: str
     quiz_success_message: str
+    quiz_pass_message: str
     quiz_fail_message: str
+    quiz_timeout_message: str
+    quiz_finish_message: str
     quiz_no_fumos_in_collection_message: str
     quiz_finish_animation_id: str
     quiz_finish_win_message: str
@@ -47,9 +65,9 @@ class Settings(BaseSettings):
     POSTGRES_DB: Optional[str] = None
     POSTGRES_USER: Optional[str] = None
     POSTGRES_PASSWORD: Optional[SecretStr] = None
+    REDIS_URI: Optional[SecretStr] = None
     HASH_SALT: SecretStr = SecretStr("salt")
     TIMEZONE: TimeZoneName = "UTC"
-    QUIZ_CHAT_ID: Optional[int] = None
     model_config = SettingsConfigDict(env_file=".env", env_ignore_empty=True)
 
     @model_validator(mode="after")
@@ -69,6 +87,16 @@ class Settings(BaseSettings):
                 self.DATABASE_URI = SecretStr("sqlite+aiosqlite:///db.sqlite")
         return self
 
+    @model_validator(mode="after")
+    def validate_redis_uri(self) -> "Settings":
+        if self.REDIS_URI:
+            try:
+                RedisDsn(self.REDIS_URI.get_secret_value())
+            except Exception as e:
+                raise Exception("Invalid REDIS_URI") from e
+        return self
+
 
 Config = Settings()
 Messages = Messages(**messages_kwargs)
+QuizChats = QuizChats(**quiz_chats_kwargs)

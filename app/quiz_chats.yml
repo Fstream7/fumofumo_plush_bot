@@ -1,0 +1,8 @@
+---
+quiz_chats: []
+# example, to run quiz in chat -1002130808822 every 2 hours with max 1 hour random delay
+# quiz_chats:
+#   - name: Test
+#     id: -1002130808822
+#     cron: "0 */2 * * *"
+#     delay: 3600

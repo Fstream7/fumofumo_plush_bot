@@ -24,6 +24,8 @@ async def set_commands(bot: Bot) -> None:
         BotCommand(command='fumo', description='Get random fumo face ᗜᴗᗜ'),
         BotCommand(command='sukusuku', description='Get random sukusuku face (´•w•`)'),
         BotCommand(command='fumofumo', description='Get Fumo of the day based on day and user id. '),
+        BotCommand(command='quiz', description='Quiz game'),
+        BotCommand(command='leaderboard', description='Show quiz leaderboard'),
         BotCommand(command='privacy', description='Get privacy policy'),
     ]
     group_chat_commands = [

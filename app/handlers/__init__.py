@@ -8,6 +8,7 @@ from . import privacy
 from . import start
 from . import private_admin
 from . import private_users
+from . import private_quiz
 
 
 def collect_routers() -> list[Router]:
@@ -18,6 +19,7 @@ def collect_routers() -> list[Router]:
         group_quiz.router,
         get_id.router,
         private_admin.router,
+        private_quiz.router,
         private_users.router,
         group_members.router,
         group_delete_messages_with_blacklist.router,

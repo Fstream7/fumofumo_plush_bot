@@ -25,13 +25,14 @@ Silly telegram bot.
 - `ADMIN_CHAT_ID=238637902` To get ADMIN_CHAT_ID start bot with default value and send him */id* command
 - `HASH_SALT` Optional salt for [hashing](https://docs.python.org/3/library/hashlib.html#randomized-hashing).
 - `TIMEZONE` Timezone for scheduler and commands that work with time. If not provided - UTC timezone wil be used. 
-- `QUIZ_CHAT_ID` Chat id to post quiz. Start bot and send him */id* command in chat where you want to receive quiz. 
 ### env for postgres (if they are not specified, then sqlite will be used):
 - `POSTGRES_HOST` postgress db host
 - `POSTGRES_PORT`  postgress db port
 - `POSTGRES_DB` postgress db name
 - `POSTGRES_USER` postgress db user
 - `POSTGRES_PASSWORD` postgress db password
+### redis uri (if not provided, memory storage will be used):
+- `REDIS_URI` redis uri
 
 #### messages located in file app/messages.yml and can be redefined using docker volume. user_full_name will be replaced with user full name
 #### To get sticker id start bot and send him /get_media_id command from admin. 
@@ -73,9 +74,9 @@ python main.py
 ```
 Or with docker compose
 ```bash
-# for development, with sqlite
+# for development, with sqlite and memory storage for states
 docker compose -f docker-compose-dev.yml up
-# for production, with postgres and basic backup
+# for production, with postgres, redis for states and basic backup
 docker compose -f docker-compose.yml up -d 
 ```
 
@@ -84,6 +85,8 @@ docker compose -f docker-compose.yml up -d
  - `/fumo` will return random fumo face ᗜᴗᗜ
  - `/sukusuku` will return random sukusuku face (´•w•`)
  - `/fumofumo` will return fumo of the day based on day and user id. 
+ - `/quiz` quiz game 
+ - `/leaderboard` leaderboard by quiz
 ### Admin commands:
  - `/get_media_id` FSM, will return given media id
  - `/add_fumo` FSM for adding fumos to db
@@ -97,4 +100,4 @@ docker compose -f docker-compose.yml up -d
 
 ### How to disable command/handler:
 1. Remove/comment handler in `app/handlers/__init__.py`
-2. Remove/comment command in `app/utils/commands.py`
+2. Remove/comment command bot commands list in `app/utils/commands.py`

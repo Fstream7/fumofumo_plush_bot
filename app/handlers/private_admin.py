@@ -1,6 +1,7 @@
 import asyncio
 import os
 import logging
+from config import Config
 from filters.admin import AdminFilter
 from filters.media_with_caption import MediaWithCaptionFilter
 from filters.text_is_link import TextIsLinkFilter
@@ -12,8 +13,17 @@ from aiogram.enums import ParseMode
 from aiogram import Router, F, types, Bot
 from aiogram.types import Message, input_media_photo, FSInputFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from db.requests import db_add_fumo, FumoCache, db_show_all_fumos, db_search_fumos_by_name
-from db.requests import db_delete_fumo_by_name, db_update_fumo_name, db_update_fumo_file_id_by_name
+from db.requests import (
+    db_add_fumo,
+    FumoCache,
+    db_show_all_fumos,
+    db_search_fumos_by_name,
+)
+from db.requests import (
+    db_delete_fumo_by_name,
+    db_update_fumo_name,
+    db_update_fumo_file_id_by_name,
+)
 from db.requests import db_update_fumo_source_link_by_name, db_get_fumo_by_name
 from db.requests import db_update_fumo_quiz_by_name
 from keyboards.edit_fumos_in_db import edit_buttons, confirm_buttons
@@ -49,7 +59,9 @@ async def cancel_handler(message: Message, state: FSMContext) -> None:
 @router.message(Command("get_media_id"))
 async def cmd_start_get_media_id(message: types.Message, state: FSMContext) -> None:
     await state.set_state(Form.get_media_id)
-    await message.answer("Send me a media, I will write their file_id. \nSend /cancel to stop")
+    await message.answer(
+        "Send me a media, I will write their file_id. \nSend /cancel to stop"
+    )
 
 
 @router.message(Form.get_media_id, F.sticker)
@@ -84,14 +96,16 @@ async def add_fumo(message: Message, session: AsyncSession):
     fumo_link = None
     if message.caption_entities is not None:
         fumo_link = message.caption_entities[0].url
-    result = await db_add_fumo(session, fumo_name, fumo_file_id, fumo_unique_id, fumo_link)
+    result = await db_add_fumo(
+        session, fumo_name, fumo_file_id, fumo_unique_id, fumo_link
+    )
     await message.reply(result)
     fumo = await db_get_fumo_by_name(session, fumo_name)
     await message.answer_photo(
         photo=fumo.file_id,
         caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
         reply_markup=edit_buttons(),
-        parse_mode=ParseMode.MARKDOWN_V2
+        parse_mode=ParseMode.MARKDOWN_V2,
     )
     await asyncio.sleep(1)
 
@@ -102,7 +116,9 @@ async def add_fumo_invalid_input(message: Message):
 
 
 @router.message(Command("list_fumos"))
-async def show_all_fumos(message: types.Message, command: CommandObject, session: AsyncSession) -> None:
+async def show_all_fumos(
+    message: types.Message, command: CommandObject, session: AsyncSession
+) -> None:
     """
     List all fumos in db with edit buttons.
     Sleep 1s after each message to avoid flood
@@ -122,7 +138,7 @@ async def show_all_fumos(message: types.Message, command: CommandObject, session
                 photo=fumo.file_id,
                 caption=f"[{escape_markdown(fumo.name)}]({fumo.source_link})",
                 reply_markup=edit_buttons(enable_for_quiz_status=fumo.use_for_quiz),
-                parse_mode=ParseMode.MARKDOWN_V2
+                parse_mode=ParseMode.MARKDOWN_V2,
             )
         except Exception as e:
             await message.answer(f"Error occurred with {fumo.name}: {str(e)}")
@@ -135,25 +151,29 @@ async def cmd_delete_fumo_from_db(callback: types.CallbackQuery, state: FSMConte
     fumo_name = callback.message.caption
     await state.set_state(Form.remove_fumo)
     await state.update_data(fumo_to_delete=fumo_name)
-    await state.update_data(message_to_delete=callback.message)
+    await state.update_data(message_id_to_delete=callback.message.message_id)
     await callback.message.answer(
         f"You are about to delete fumo {fumo_name}. Is that correct?\n"
         "Fumo will be removed from the collection of all users if it in the quiz"
         "⚠️Warning, fumo id cache will be rebuilded.⚠️",
-        reply_markup=confirm_buttons()
+        reply_markup=confirm_buttons(),
     )
     await callback.answer()
 
 
 @router.callback_query(Form.remove_fumo, F.data == "confirm_delete")
-async def delete_fumo_from_db_confirm(callback: types.CallbackQuery, state: FSMContext, session: AsyncSession):
+async def delete_fumo_from_db_confirm(
+    callback: types.CallbackQuery, state: FSMContext, session: AsyncSession, bot: Bot
+):
     user_data = await state.get_data()
-    result = await db_delete_fumo_by_name(session, user_data['fumo_to_delete'])
-    message_to_delete = user_data['message_to_delete']
+    result = await db_delete_fumo_by_name(session, user_data["fumo_to_delete"])
+    message_id_to_delete = user_data["message_id_to_delete"]
     await FumoCache.update_fumo_ids_cache(session)
     await callback.message.answer(result)
     await callback.message.delete()
-    await message_to_delete.delete()
+    await bot.delete_message(
+        chat_id=Config.ADMIN_CHAT_ID, message_id=message_id_to_delete
+    )
     await state.clear()
     await callback.answer()
 
@@ -170,7 +190,9 @@ async def cmd_edit_fumo_name(callback: types.CallbackQuery, state: FSMContext):
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_name)
     await state.update_data(fumo_to_edit=fumo_name)
-    await state.update_data(message_to_edit=callback.message)
+    await state.update_data(message_id_to_edit=callback.message.message_id)
+    if callback.message.caption_entities:
+        await state.update_data(fumo_link=(callback.message.caption_entities[0]).url)
     await callback.message.answer(
         f"Send me a new name for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -179,19 +201,21 @@ async def cmd_edit_fumo_name(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.message(Form.edit_fumo_name, F.text)
-async def edit_fumo_name(message: Message, session: AsyncSession, state: FSMContext):
+async def edit_fumo_name(
+    message: Message, session: AsyncSession, state: FSMContext, bot: Bot
+):
     user_data = await state.get_data()
-    old_fumo_name = user_data['fumo_to_edit']
-    message_to_edit = user_data['message_to_edit']
+    old_fumo_name = user_data["fumo_to_edit"]
+    message_id_to_edit = user_data["message_id_to_edit"]
+    fumo_link = user_data.get("fumo_link")
     new_fumo_name = message.text
     result = await db_update_fumo_name(session, old_fumo_name, new_fumo_name)
-    fumo_link = None
-    if message_to_edit.caption_entities is not None:
-        fumo_link = message_to_edit.caption_entities[0].url
-    await message_to_edit.edit_caption(
+    await bot.edit_message_caption(
         caption=f"[{escape_markdown(new_fumo_name)}]({fumo_link})",
-        reply_markup=message_to_edit.reply_markup,
-        parse_mode=ParseMode.MARKDOWN_V2
+        reply_markup=edit_buttons(),
+        parse_mode=ParseMode.MARKDOWN_V2,
+        chat_id=Config.ADMIN_CHAT_ID,
+        message_id=message_id_to_edit,
     )
     await message.reply(result)
     await state.clear()
@@ -202,7 +226,9 @@ async def cmd_edit_fumo_image(callback: types.CallbackQuery, state: FSMContext):
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_image)
     await state.update_data(fumo_to_edit=fumo_name)
-    await state.update_data(message_to_edit=callback.message)
+    await state.update_data(message_id_to_edit=callback.message.message_id)
+    if callback.message.caption_entities:
+        await state.update_data(fumo_link=(callback.message.caption_entities[0]).url)
     await callback.message.answer(
         f"Send me a new image for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -211,21 +237,28 @@ async def cmd_edit_fumo_image(callback: types.CallbackQuery, state: FSMContext):
 
 
 @router.message(Form.edit_fumo_image, F.photo)
-async def edit_fumo_image(message: Message, session: AsyncSession, state: FSMContext):
+async def edit_fumo_image(
+    message: Message, session: AsyncSession, state: FSMContext, bot: Bot
+):
     user_data = await state.get_data()
-    fumo_name = user_data['fumo_to_edit']
-    message_to_edit = user_data['message_to_edit']
+    fumo_name = user_data["fumo_to_edit"]
+    message_id_to_edit = user_data["message_id_to_edit"]
+    fumo_link = user_data.get("fumo_link")
     new_fumo_file_id = message.photo[-1].file_id
     new_file_unique_id = message.photo[-1].file_unique_id
-    result = await db_update_fumo_file_id_by_name(session, fumo_name, new_fumo_file_id, new_file_unique_id)
-    await message_to_edit.edit_media(
+    result = await db_update_fumo_file_id_by_name(
+        session, fumo_name, new_fumo_file_id, new_file_unique_id
+    )
+    await bot.edit_message_media(
         media=input_media_photo.InputMediaPhoto(
             type="photo",
             media=new_fumo_file_id,
-            caption=escape_markdown(fumo_name),
-            caption_entities=message_to_edit.caption_entities
+            caption=f"[{escape_markdown(fumo_name)}]({fumo_link})",
+            parse_mode=ParseMode.MARKDOWN_V2,
         ),
-        reply_markup=message_to_edit.reply_markup,
+        reply_markup=edit_buttons(),
+        chat_id=Config.ADMIN_CHAT_ID,
+        message_id=message_id_to_edit,
     )
     await message.reply(result)
     await state.clear()
@@ -236,7 +269,9 @@ async def cmd_edit_fumo_source_link(callback: types.CallbackQuery, state: FSMCon
     fumo_name = callback.message.caption
     await state.set_state(Form.edit_fumo_source_link)
     await state.update_data(fumo_to_edit=fumo_name)
-    await state.update_data(message_to_edit=callback.message)
+    await state.update_data(message_id_to_edit=callback.message.message_id)
+    if callback.message.caption_entities:
+        await state.update_data(fumo_link=(callback.message.caption_entities[0]).url)
     await callback.message.answer(
         f"Send me a new link for {fumo_name}. I will update it in the database.\n"
         "Send /cancel to stop."
@@ -245,18 +280,28 @@ async def cmd_edit_fumo_source_link(callback: types.CallbackQuery, state: FSMCon
 
 
 @router.message(Form.edit_fumo_source_link, F.text, TextIsLinkFilter())
-async def edit_fumo_source_link(message: Message, session: AsyncSession, state: FSMContext):
+async def edit_fumo_source_link(
+    message: Message, session: AsyncSession, state: FSMContext, bot: Bot
+):
     user_data = await state.get_data()
-    fumo_name = user_data['fumo_to_edit']
-    message_to_edit = user_data['message_to_edit']
+    fumo_name = user_data["fumo_to_edit"]
+    message_id_to_edit = user_data["message_id_to_edit"]
+    fumo_link = user_data.get("fumo_link")
     new_fumo_source_link = message.text
-    result = await db_update_fumo_source_link_by_name(session, fumo_name, new_fumo_source_link)
-    await message_to_edit.edit_caption(
-        caption=f"[{escape_markdown(fumo_name)}]({new_fumo_source_link})",
-        reply_markup=message_to_edit.reply_markup,
-        parse_mode=ParseMode.MARKDOWN_V2
+    result = await db_update_fumo_source_link_by_name(
+        session, fumo_name, new_fumo_source_link
     )
-    await message.reply(result)
+    if fumo_link != new_fumo_source_link:
+        await bot.edit_message_caption(
+            caption=f"[{escape_markdown(fumo_name)}]({new_fumo_source_link})",
+            reply_markup=edit_buttons(),
+            parse_mode=ParseMode.MARKDOWN_V2,
+            chat_id=Config.ADMIN_CHAT_ID,
+            message_id=message_id_to_edit,
+        )
+        await message.reply(result)
+    else:
+        await message.reply("This link already set.")
     await state.clear()
 
 
@@ -266,17 +311,14 @@ async def edit_fumo_source_link_invalid_input(message: Message):
 
 
 @router.message(Command("update_fumo_cache"))
-async def update_fumo_cache(message: types.Message,  session: AsyncSession) -> None:
+async def update_fumo_cache(message: types.Message, session: AsyncSession) -> None:
     await FumoCache.update_fumo_ids_cache(session)
     await message.reply("Cache updated")
 
 
 @router.message(Command("download_fumo_images"))
 async def download_fumo_images(
-    message: types.Message,
-    command: CommandObject,
-    session: AsyncSession,
-    bot: Bot
+    message: types.Message, command: CommandObject, session: AsyncSession, bot: Bot
 ) -> None:
     search_pattern = command.args
     path = "media/photos"
@@ -306,7 +348,9 @@ async def download_fumo_images(
 
 
 @router.message(Command("import_fumo_images"))
-async def import_fumo_images(message: types.Message, command: CommandObject, session: AsyncSession) -> None:
+async def import_fumo_images(
+    message: types.Message, command: CommandObject, session: AsyncSession
+) -> None:
     """
     This command will upload images in media/photos/ and add/update their file_id in db for future use.
     https://core.telegram.org/bots/api#sending-files
@@ -344,7 +388,7 @@ async def import_fumo_images(message: types.Message, command: CommandObject, ses
                     fumo_name,
                     fumo_photo.photo[-1].file_id,
                     fumo_photo.photo[-1].file_unique_id,
-                    source_link=None
+                    source_link=None,
                 )
             await message.reply(result)
         except Exception as e:
@@ -354,7 +398,12 @@ async def import_fumo_images(message: types.Message, command: CommandObject, ses
 
 
 @router.callback_query(F.data == "toggle_fumo_for_quiz")
-async def cmd_toggle_fumo_for_quiz(callback: types.CallbackQuery, session: AsyncSession):
+async def cmd_toggle_fumo_for_quiz(
+    callback: types.CallbackQuery, session: AsyncSession
+):
+    """
+    Enable/disable fumo for quiz
+    """
     fumo_name = callback.message.caption
     fumo = await db_get_fumo_by_name(session, fumo_name)
     new_use_for_quiz = not fumo.use_for_quiz

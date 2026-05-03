@@ -1,3 +1,5 @@
+# for development and basic functions
+# sqlite for store data, memory storage for states
 services:
 
   telegram_bot:
@@ -13,4 +15,3 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-}
       - HASH_SALT=${HASH_SALT:-}
       - TIMEZONE=${TIMEZONE:-}
-      - QUIZ_CHAT_ID=${QUIZ_CHAT_ID:-}
