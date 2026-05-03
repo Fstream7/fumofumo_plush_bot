@@ -104,6 +104,11 @@ async def private_quiz_start(
     """
     await state.set_state(Form.quiz_is_active)
     fumo_id_list = await db_get_quiz_fumo_ids(session)
+    if len(fumo_id_list) < 6:
+        await message.answer(
+            "To start quiz bot should have at least 6 fumos in db"
+        )
+        raise Exception("Not enough fumos to start quiz")
     shuffle(fumo_id_list)
     await state.update_data(fumo_id_list=fumo_id_list)
     await state.update_data(curent_position=0)
