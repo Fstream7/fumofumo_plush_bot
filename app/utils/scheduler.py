@@ -4,7 +4,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from aiogram import Bot, Dispatcher
 from pytz import timezone
-from config import Config, Messages
+from config import Config, QuizChats
 from handlers.group_quiz import quiz_start
 
 
@@ -23,12 +23,14 @@ def setup_scheduler(
         CronTrigger(hour=0, minute=0, timezone=timezone(Config.TIMEZONE)),
         args=[session],
     )
-    for quiz_chat in Messages.quiz_chats:
+    for quiz_chat in QuizChats.quiz_chats:
         if quiz_chat.cron:
             scheduler.add_job(
                 quiz_start,
-                CronTrigger.from_crontab(quiz_chat.cron, timezone=timezone(Config.TIMEZONE)),
+                CronTrigger.from_crontab(
+                    quiz_chat.cron, timezone=timezone(Config.TIMEZONE)
+                ),
                 args=[session, bot, dp, quiz_chat.id, quiz_chat.delay],
-                name="quiz_start "+quiz_chat.name
+                name="quiz_start " + quiz_chat.name,
             )
     return scheduler

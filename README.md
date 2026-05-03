@@ -74,9 +74,9 @@ python main.py
 ```
 Or with docker compose
 ```bash
-# for development, with sqlite
+# for development, with sqlite and memory storage for states
 docker compose -f docker-compose-dev.yml up
-# for production, with postgres and basic backup
+# for production, with postgres, redis for states and basic backup
 docker compose -f docker-compose.yml up -d 
 ```
 
@@ -100,4 +100,4 @@ docker compose -f docker-compose.yml up -d
 
 ### How to disable command/handler:
 1. Remove/comment handler in `app/handlers/__init__.py`
-2. Remove/comment command in `app/utils/commands.py`
+2. Remove/comment command bot commands list in `app/utils/commands.py`

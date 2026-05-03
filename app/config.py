@@ -10,11 +10,20 @@ with open(file_path, "r", encoding="utf-8") as stream1:
     messages_kwargs = yaml.safe_load(stream1)
 
 
+file_path = path.join(path.dirname(__file__), "quiz_chats.yml")
+with open(file_path, "r", encoding="utf-8") as stream1:
+    quiz_chats_kwargs = yaml.safe_load(stream1)
+
+
 class QuizChat(BaseModel):
     name: Optional[str] = ""
     id: int
     cron: Optional[str] = None
     delay: Optional[int] = 0
+
+
+class QuizChats(BaseModel):
+    quiz_chats: list[Optional[QuizChat]] = []
 
 
 class Messages(BaseModel):
@@ -34,7 +43,6 @@ class Messages(BaseModel):
     privacy: str
     blacklist_words: list[str]
     blacklist_ban_message: str
-    quiz_chats: list[QuizChat]
     quiz_guess_message: str
     quiz_success_message: str
     quiz_pass_message: str
@@ -91,3 +99,4 @@ class Settings(BaseSettings):
 
 Config = Settings()
 Messages = Messages(**messages_kwargs)
+QuizChats = QuizChats(**quiz_chats_kwargs)

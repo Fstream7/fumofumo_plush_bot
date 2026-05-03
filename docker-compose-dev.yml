@@ -1,3 +1,5 @@
+# for development and basic functions
+# sqlite for store data, memory storage for states
 services:
 
   telegram_bot:

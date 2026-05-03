@@ -116,21 +116,6 @@ blacklist_words:
   - labubi.xyz
   - labubas.xyz
 
-quiz_chats:
-  - name: Test
-    id: -1002130808822
-  - name: УТЕДВА
-    id: -1002177414999
-    cron: "0 */2 * * *"
-    delay: 3600
-  - name: I wish I could change this group name
-    id: -1001836358375
-    cron: "0 8 * * *"
-    delay: 86400
-  - name: Ni4kofoxArts
-    id: -1002687661671
-    cron: "0 */2 * * *"
-    delay: 3600
 quiz_guess_message: "Guess the Fumo, reply with Fumo name to add Fumo to your collection."
 quiz_success_message: |
   That's right, {fumo} has been added to your collection.

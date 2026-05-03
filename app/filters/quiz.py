@@ -1,7 +1,7 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 from aiogram import Bot
-from config import Messages
+from config import QuizChats
 
 
 class GroupQuizFilter(BaseFilter):
@@ -10,7 +10,7 @@ class GroupQuizFilter(BaseFilter):
     """
 
     async def __call__(self, message: Message, bot: Bot) -> bool:
-        return any(chat.id == message.chat.id for chat in Messages.quiz_chats)
+        return any(chat.id == message.chat.id for chat in QuizChats.quiz_chats)
 
 
 class QuizReplyFilter(BaseFilter):
