@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.enums import ParseMode
-from aiogram.types import input_media_animation, LinkPreviewOptions
+from aiogram.types import LinkPreviewOptions
 from config import Messages, Config
 from db.models import Fumo
 from db.requests import db_get_random_fumo_for_quiz
@@ -43,11 +43,17 @@ async def quiz_end(state: FSMContext, user_name: Optional[str], bot: Bot) -> Non
                 await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
+                    caption=Messages.quiz_finish_win_message.format(
+                        user_full_name=user_name
+                    ),
                 )
             else:
                 await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
+                    caption=Messages.quiz_finish_win_message.format(
+                        user_full_name=user_name
+                    ),
                 )
     except TelegramBadRequest as error:
         logging.error(error)
@@ -145,11 +151,9 @@ async def cmd_quiz_guess(
     if message.reply_to_message.message_id == quiz_message_id:
         guess = message.text.lower().split()
         correct_answer = fumo_name.lower().split()
-        logging.debug(guess)
-        logging.debug(correct_answer)
         if (
             guess == correct_answer
-            or str(guess) == correct_answer[0]
+            or guess[0] == correct_answer[0]
             or (
                 len(guess) > 1
                 and len(correct_answer) > 1
