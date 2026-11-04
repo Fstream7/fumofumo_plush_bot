@@ -51,9 +51,7 @@ async def quiz_end(state: FSMContext, user_name: Optional[str], bot: Bot) -> Non
                 await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
-                    caption=Messages.quiz_finish_win_message.format(
-                        user_full_name=user_name
-                    ),
+                    caption=Messages.quiz_finish_fail_message,
                 )
     except TelegramBadRequest as error:
         logging.error(error)
