@@ -40,24 +40,12 @@ async def quiz_end(state: FSMContext, user_name: Optional[str], bot: Bot) -> Non
         quiz_chat_id = quiz_data.get("quiz_chat_id")
         if quiz_message_id:
             if user_name:
-                await bot.edit_message_media(
-                    media=input_media_animation.InputMediaAnimation(
-                        type="animation",
-                        media=Messages.quiz_finish_animation_id,
-                        caption=Messages.quiz_finish_win_message.format(
-                            user_full_name=user_name
-                        ),
-                    ),
+                await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
                 )
             else:
-                await bot.edit_message_media(
-                    media=input_media_animation.InputMediaAnimation(
-                        type="animation",
-                        media=Messages.quiz_finish_animation_id,
-                        caption=Messages.quiz_finish_fail_message,
-                    ),
+                await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
                 )
@@ -155,9 +143,19 @@ async def cmd_quiz_guess(
     fumo_name = quiz_data["fumo_name"]
     quiz_message_id = quiz_data["quiz_message_id"]
     if message.reply_to_message.message_id == quiz_message_id:
+        guess = message.text.lower().split()
+        correct_answer = fumo_name.lower().split()
+        logging.debug(guess)
+        logging.debug(correct_answer)
         if (
-            message.text.lower() == fumo_name.lower()
-            or message.text.lower() == fumo_name.split()[0].lower()
+            guess == correct_answer
+            or str(guess) == correct_answer[0]
+            or (
+                len(guess) > 1
+                and len(correct_answer) > 1
+                and guess[0] == correct_answer[1]
+                and guess[1] == correct_answer[0]
+            )
         ):
             fumo_id = quiz_data["fumo_id"]
             fumo_link = quiz_data["fumo_link"]
