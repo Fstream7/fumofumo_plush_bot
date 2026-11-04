@@ -8,7 +8,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 from aiogram.enums import ParseMode
-from aiogram.types import input_media_animation, LinkPreviewOptions
+from aiogram.types import LinkPreviewOptions
 from config import Messages, Config
 from db.models import Fumo
 from db.requests import db_get_random_fumo_for_quiz
@@ -40,26 +40,20 @@ async def quiz_end(state: FSMContext, user_name: Optional[str], bot: Bot) -> Non
         quiz_chat_id = quiz_data.get("quiz_chat_id")
         if quiz_message_id:
             if user_name:
-                await bot.edit_message_media(
-                    media=input_media_animation.InputMediaAnimation(
-                        type="animation",
-                        media=Messages.quiz_finish_animation_id,
-                        caption=Messages.quiz_finish_win_message.format(
-                            user_full_name=user_name
-                        ),
-                    ),
+                await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
+                    caption=Messages.quiz_finish_win_message.format(
+                        user_full_name=user_name
+                    ),
                 )
             else:
-                await bot.edit_message_media(
-                    media=input_media_animation.InputMediaAnimation(
-                        type="animation",
-                        media=Messages.quiz_finish_animation_id,
-                        caption=Messages.quiz_finish_fail_message,
-                    ),
+                await bot.edit_message_caption(
                     chat_id=quiz_chat_id,
                     message_id=quiz_message_id,
+                    caption=Messages.quiz_finish_win_message.format(
+                        user_full_name=user_name
+                    ),
                 )
     except TelegramBadRequest as error:
         logging.error(error)
@@ -155,9 +149,17 @@ async def cmd_quiz_guess(
     fumo_name = quiz_data["fumo_name"]
     quiz_message_id = quiz_data["quiz_message_id"]
     if message.reply_to_message.message_id == quiz_message_id:
+        guess = message.text.lower().split()
+        correct_answer = fumo_name.lower().split()
         if (
-            message.text.lower() == fumo_name.lower()
-            or message.text.lower() == fumo_name.split()[0].lower()
+            guess == correct_answer
+            or guess[0] == correct_answer[0]
+            or (
+                len(guess) > 1
+                and len(correct_answer) > 1
+                and guess[0] == correct_answer[1]
+                and guess[1] == correct_answer[0]
+            )
         ):
             fumo_id = quiz_data["fumo_id"]
             fumo_link = quiz_data["fumo_link"]
