@@ -8,6 +8,6 @@ asyncpg==0.31.0 # only need for postgres
 aiosqlite==0.21.0 # only need for sqlite
 sqlalchemy[asyncio]==2.0.44
 apscheduler==3.11.0
-tzdata==2025.2
+tzdata==2026.6
 pytz==2025.2
 redis==7.4.0 # only need for redis
