@@ -68,22 +68,8 @@ services:
       - REDIS_URI=redis://redis:6379/0
       - DATABASE_URI=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
     command: uvicorn web.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips="127.0.0.1"
-    expose:
-      - "8000"
-
-  nginx:
-    image: nginx:stable-alpine3.24
-    restart: always
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      # - ./certbot/www:/var/www/certbot:ro
-      # - ./certbot/conf:/etc/letsencrypt:ro
-      - media:/var/www/media:ro
-    networks:
-      - backend
+      - "127.0.0.1:8000:8000"
 
   backup:
     image: huacnlee/gobackup:v2.14.0
@@ -110,6 +96,11 @@ networks:
   backend:
 
 volumes:
-  media:
   backups:
   redis:
+  media:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /var/www/media
