@@ -52,9 +52,9 @@ services:
       - TIMEZONE=${TIMEZONE:-}
       - REDIS_URI=redis://redis:6379/0
       - DATABASE_URI=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
-    command: uvicorn web.main:app --host 0.0.0.0 --port 8000 --proxy-headers
-    expose:
-      - "8000"
+    command: uvicorn web.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips="127.0.0.1"
+    ports:
+      - "127.0.0.1:8000:8000"
 
   redis:
     image: redis:8.4.2-alpine
