@@ -1,7 +1,6 @@
 # for development and basic functions
 # sqlite for store data, memory storage for states
 services:
-
   telegram_bot:
     build:
       context: .
@@ -15,3 +14,20 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-}
       - HASH_SALT=${HASH_SALT:-}
       - TIMEZONE=${TIMEZONE:-}
+
+  web:
+    build:
+      context: .
+    restart: always
+    volumes:
+      - ./app:/app
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
+      - LOG_LEVEL=${LOG_LEVEL:-}
+      - HASH_SALT=${HASH_SALT:-}
+      - TIMEZONE=${TIMEZONE:-}
+    command: uvicorn web.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"

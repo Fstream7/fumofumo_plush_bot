@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="image-container">
+    <img src="{{ url_for('media', path='/' + image) }}" alt="Fumo">
+    <p class="text-xl font-semibold">{{ name }}</p>
+</div>
+
+<style>
+    .image-container {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        gap: 10px;
+    }
+
+    .image-container img {
+        max-width: 90%;
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    .image-container h2,
+    .image-container p {
+        margin: 0;
+    }
+</style>
+{% endblock %}
