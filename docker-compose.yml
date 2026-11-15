@@ -50,7 +50,7 @@ services:
       - DATABASE_URI=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
 
   web:
-    image: ghcr.io/fstream7/fumofumo_plush_bot:dev
+    image: ghcr.io/fstream7/fumofumo_plush_bot:main
     restart: always
     volumes:
       - "/var/www/media:/app/media:rw"

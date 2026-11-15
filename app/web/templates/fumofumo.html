@@ -1,20 +1,56 @@
-
 {% extends "base.html" %}
 
 {% block title %}{{ name }} - Fumofumo{% endblock %}
 
 {% block content %}
-    <h1>Your Fumo of the Day</h1>
+    <style>
+        /* Applies only while this page is rendered */
+        html, body {
+            overflow: hidden;      /* no scrollbars on this page */
+            height: 100%;
+            margin: 0;
+        }
 
-    <img src="{{ url_for('media', path='/photos/' + image) }}" alt="Fumo">
+        .fumo-page {
+            box-sizing: border-box;
+            height: 100vh;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            text-align: center;
+        }
 
-    <h2>
-        <a href="{{ link }}" class="text-xl font-semibold">
-            {{ name }}
-        </a>
-    </h2>
+        .fumo-page img {
+            max-width: 100%;
+            max-height: 60vh;      /* leaves room for the title and link */
+            object-fit: contain;   /* keeps aspect ratio, no distortion */
+        }
 
-    <p>
-        <a href="/">Back to home</a>
-    </p>
+        .fumo-page h1,
+        .fumo-page h2,
+        .fumo-page p {
+            margin: 0;
+            max-width: 100%;
+            overflow-wrap: anywhere;  /* long names wrap instead of overflowing */
+        }
+    </style>
+
+    <div class="fumo-page">
+        <h1>Your Fumo of the Day</h1>
+
+        <img src="{{ url_for('media', path='/photos/' + image) }}" alt="Fumo">
+
+        <h2>
+            <a href="{{ link }}" class="text-xl font-semibold">
+                {{ name }}
+            </a>
+        </h2>
+
+        <p>
+            <a href="/">Back to home</a>
+        </p>
+    </div>
 {% endblock %}
