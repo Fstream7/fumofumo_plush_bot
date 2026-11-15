@@ -20,6 +20,9 @@ async def fumofumo(
     session: AsyncSession = Depends(get_db_session),
     user_uuid: str = Depends(get_user_uuid),
 ) -> HTMLResponse:
+    """
+    Return fumofumo of the day
+    """
     converted_date = datetime.now(ZoneInfo(Config.TIMEZONE))
     fumo_string = f"{user_uuid}_{converted_date.strftime('%Y%m%d')}"
     fumo_hash = hashlib.blake2b(
@@ -30,12 +33,18 @@ async def fumofumo(
     fumo_id = int(fumo_hash, 16)
 
     fumo = await db_get_fumo_by_id(session, fumo_id)
-    name = fumo.name if fumo else Messages.fumofumo_message_not_found
-    image = f"{fumo.name}.jpg" if fumo else Messages.fumofumo_message_not_found
+    if fumo:
+        context = {
+            "name": fumo.name,
+            "image": f"{fumo.name}.jpg",
+            "link": fumo.source_link,
+        }
+    else:
+        context = {"name": Messages.fumofumo_message_not_found}
     template_response = templates.TemplateResponse(
         request=request,
         name="fumofumo.html",
-        context={"name": name, "image": image},
+        context=context,
     )
     template_response.headers.raw.extend(response.headers.raw)
     return template_response

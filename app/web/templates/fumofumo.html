@@ -1,31 +1,20 @@
+
 {% extends "base.html" %}
 
+{% block title %}{{ name }} - Fumofumo{% endblock %}
+
 {% block content %}
-<div class="image-container">
+    <h1>Your Fumo of the Day</h1>
+
     <img src="{{ url_for('media', path='/' + image) }}" alt="Fumo">
-    <p class="text-xl font-semibold">{{ name }}</p>
-</div>
 
-<style>
-    .image-container {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        gap: 10px;
-    }
+    <h2>
+        <a href="{{ link }}" class="text-xl font-semibold">
+            {{ name }}
+        </a>
+    </h2>
 
-    .image-container img {
-        max-width: 90%;
-        max-height: 400px;
-        object-fit: contain;
-    }
-
-    .image-container h2,
-    .image-container p {
-        margin: 0;
-    }
-</style>
+    <p>
+        <a href="/">Back to home</a>
+    </p>
 {% endblock %}

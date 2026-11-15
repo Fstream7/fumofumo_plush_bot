@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import fumofumo
+from . import index, fumofumo
 
 
 def collect_routers() -> list[APIRouter]:
@@ -7,4 +7,5 @@ def collect_routers() -> list[APIRouter]:
 
 
 router = APIRouter()
+router.include_router(index.router)
 router.include_router(fumofumo.router)
