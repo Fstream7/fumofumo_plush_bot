@@ -15,7 +15,7 @@ services:
       - PGDATA=/var/lib/postgresql/data
 
   telegram_bot:
-    image:  ghcr.io/fstream7/fumofumo_plush_bot:main
+    image: ghcr.io/fstream7/fumofumo_plush_bot:main
     restart: always
     volumes:
       - "media:/app/media:rw"
@@ -33,6 +33,28 @@ services:
       - TIMEZONE=${TIMEZONE:-}
       - REDIS_URI=redis://redis:6379/0
       - DATABASE_URI=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+
+  web:
+    image: ghcr.io/fstream7/fumofumo_plush_bot:main
+    restart: always
+    volumes:
+      - "media:/app/media:rw"
+      - "/etc/localtime:/etc/localtime:ro"
+    networks:
+      - backend
+    depends_on:
+      - db
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ADMIN_CHAT_ID=${ADMIN_CHAT_ID}
+      - LOG_LEVEL=${LOG_LEVEL:-}
+      - HASH_SALT=${HASH_SALT:-}
+      - TIMEZONE=${TIMEZONE:-}
+      - REDIS_URI=redis://redis:6379/0
+      - DATABASE_URI=postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:${POSTGRES_PORT:-5432}/${POSTGRES_DB}
+    command: uvicorn web.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips="127.0.0.1"
+    ports:
+      - "127.0.0.1:8000:8000"
 
   redis:
     image: redis:8.4.2-alpine
