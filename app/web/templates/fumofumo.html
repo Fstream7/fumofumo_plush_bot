@@ -6,7 +6,7 @@
 {% block content %}
     <h1>Your Fumo of the Day</h1>
 
-    <img src="{{ url_for('media', path='/' + image) }}" alt="Fumo">
+    <img src="{{ url_for('media', path='/photos/' + image) }}" alt="Fumo">
 
     <h2>
         <a href="{{ link }}" class="text-xl font-semibold">

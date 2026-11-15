@@ -7,5 +7,5 @@ from config import Config
 logging.basicConfig(level=Config.LOG_LEVEL)
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="web/static"), name="static")
-app.mount("/media", StaticFiles(directory="media/photos"), name="media")
+app.mount("/media", StaticFiles(directory="media"), name="media")
 app.include_router(router)
