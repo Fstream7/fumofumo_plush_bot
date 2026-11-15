@@ -40,7 +40,7 @@ async def fumofumo(
             "link": fumo.source_link,
         }
     else:
-        context = {"name": Messages.fumofumo_message_not_found}
+        context = {"name": Messages.fumofumo_message_not_found, "image": ""}
     template_response = templates.TemplateResponse(
         request=request,
         name="fumofumo.html",
