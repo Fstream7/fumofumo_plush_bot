@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,10 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
     <title>{% block title %}Fumofumo{% endblock %}</title>
+    <style>
+        :root {
+            --link: #2a2529;
+            --link-hover: #7d3569;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;                 /* pushes the footer to the bottom */
+            display: flex;
+            flex-direction: column;
+        }
+
+        footer {
+            padding: 1rem;
+            text-align: center;
+        }
+
+        /* Links */
+        a {
+            color: var(--link);
+            text-decoration: none;
+            font-weight: 600;
+            background-image: linear-gradient(currentColor, currentColor);
+            background-size: 0% 2px;            /* underline starts hidden */
+            background-position: 0 100%;
+            background-repeat: no-repeat;
+            transition: background-size 0.25s ease, color 0.2s ease;
+        }
+
+        a:hover,
+        a:focus-visible {
+            color: var(--link-hover);
+            background-size: 100% 2px;          /* underline slides in */
+        }
+
+        a:focus-visible {
+            outline: 2px solid var(--link);
+            outline-offset: 3px;
+            border-radius: 3px;
+        }
+
+        footer a {
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0.85;
+        }
+
+        footer a:hover {
+            opacity: 1;
+        }
+    </style>
+    {% block head %}{% endblock %}
 </head>
 <body>
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <footer>
+        <a href="https://x.com/fstream_fumo" target="_blank" rel="noopener noreferrer">
+            Author
+        </a>
+    </footer>
 </body>
 </html>
