@@ -1,19 +1,23 @@
 {% extends "base.html" %}
-
+ 
 {% block title %}{{ name }} - Fumofumo{% endblock %}
-
-{% block content %}
+ 
+{% block head %}
     <style>
-        /* Applies only while this page is rendered */
+        /* Applies only to this page: no scrollbars */
         html, body {
-            overflow: hidden;      /* no scrollbars on this page */
+            overflow: hidden;
             height: 100%;
             margin: 0;
         }
-
+ 
+        main {
+            min-height: 0;
+        }
         .fumo-page {
             box-sizing: border-box;
-            height: 100vh;
+            flex: 1;
+            min-height: 0;
             padding: 1rem;
             display: flex;
             flex-direction: column;
@@ -37,7 +41,9 @@
             overflow-wrap: anywhere;  /* long names wrap instead of overflowing */
         }
     </style>
-
+{% endblock %}
+ 
+{% block content %}
     <div class="fumo-page">
         <h1>Your Fumo of the Day</h1>
 
